@@ -1,0 +1,24 @@
+<div>
+  <h2>Record Session</h2>
+
+  <div>
+    <input
+      type="url"
+      [(ngModel)]="url"
+      placeholder="https://example.com"
+      [disabled]="phase !== 'idle'"
+    />
+
+    <button (click)="open()" [disabled]="phase !== 'idle' || !url">
+      Open Playwright
+    </button>
+  </div>
+
+  <p *ngIf="phase === 'recording'">
+    Playwright is open — record your session, then close the browser when done.
+  </p>
+
+  <p *ngIf="error" style="color: red;">{{ error }}</p>
+
+  <pre *ngIf="generatedScript">{{ generatedScript }}</pre>
+</div>
