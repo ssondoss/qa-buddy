@@ -1,50 +1,56 @@
-import { Component, DestroyRef, inject, NgZone } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { RecordService } from './record.service';
-import type { RecordingPhase } from '@qa-buddy/shared-types';
+import { WorkflowEditorComponent } from './components/workflow-editor/workflow-editor.component';
+import type { RecordingPhase } from './models/record-contract.model';
+import { RecordWorkflowParserService } from './services/record-workflow-parser.service';
+import { RecordService } from './services/record.service';
 
 @Component({
   selector: 'app-record',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, WorkflowEditorComponent],
   templateUrl: './record.component.html',
+  styleUrl: './record.component.scss',
 })
 export class RecordComponent {
-  url = '';
-  phase: RecordingPhase = 'idle';
-  generatedScript: string | null = null;
-  error: string | null = null;
+  readonly url = signal('');
+  readonly phase = signal<RecordingPhase>('idle');
+  readonly generatedScript = signal<string | null>(null);
+  readonly error = signal<string | null>(null);
+  readonly workflowSteps = computed(() => this.workflowParser.parse(this.generatedScript()));
 
-  private destroyRef = inject(DestroyRef);
+  private readonly destroyRef = inject(DestroyRef);
 
-  constructor(private recordService: RecordService, private zone: NgZone) {}
+  constructor(
+    private readonly recordService: RecordService,
+    private readonly workflowParser: RecordWorkflowParserService,
+  ) {}
 
   open(): void {
-    this.error = null;
-    this.generatedScript = null;
+    this.error.set(null);
+    this.generatedScript.set(null);
 
-    this.recordService.open({ url: this.url })
+    this.recordService
+      .open({ url: this.url() })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (status) => {
-          console.log('[record] SSE event received:', status);
-          this.zone.run(() => {
-            this.phase = status.phase;
+          this.phase.set(status.phase);
 
-            if (status.phase === 'idle' && status.hasResult) {
-              this.recordService.getResult().subscribe({
+          if (status.phase === 'idle' && status.hasResult) {
+            this.recordService
+              .getResult()
+              .pipe(takeUntilDestroyed(this.destroyRef))
+              .subscribe({
                 next: (res) => {
-                  console.log('[record] result received, length:', res.content.length);
-                  this.generatedScript = res.content;
+                  this.generatedScript.set(res.content);
                 },
-                error: (err) => (this.error = err.error?.error ?? 'Failed to fetch result'),
+                error: (err) => this.error.set(err.error?.error ?? 'Failed to fetch result'),
               });
-            }
-          });
+          }
         },
-        error: (err) => this.zone.run(() => (this.error = err?.error ?? 'Failed to open browser')),
+        error: (err) => this.error.set(err?.error ?? 'Failed to open browser'),
       });
   }
 }
