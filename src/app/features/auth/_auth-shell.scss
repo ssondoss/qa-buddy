@@ -1,5 +1,4 @@
 .auth-page {
-  padding: clamp(1rem, 4vw, 3rem);
   background: var(--gradient-auth-page);
   background-position: center;
   background-size: cover;
@@ -8,15 +7,13 @@
   font-family: var(--font-sans);
 }
 
-.auth-shell {
-  width: min(100%, 74rem);
-  min-height: calc(100vh - clamp(2rem, 8vw, 6rem));
-}
-
 .auth-card {
   position: relative;
   overflow: visible;
+  width: 100%;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
   border: 1px solid rgba(255, 241, 118, 0.2);
+  border-radius: var(--radius-lg);
   background:
     radial-gradient(circle at 50% 0%, rgba(255, 241, 118, 0.13), transparent 38%),
     linear-gradient(180deg, rgba(12, 13, 10, 0.68), rgba(8, 9, 7, 0.46));
@@ -37,25 +34,14 @@
   pointer-events: none;
 }
 
-.auth-brand {
-  position: absolute;
-  left: 90%;
-  z-index: 2;
-}
-
-.auth-brand::before {
-  content: none;
-}
-
-.auth-brand img {
-  width: 88%;
-  height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 0 24px rgba(255, 241, 118, 0.2));
+.auth-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .auth-card__eyebrow,
 .auth-field span {
+  margin-bottom: 0.25rem;
   color: var(--auth-accent, var(--color-teal-700));
   font-size: 0.82rem;
   font-weight: 700;
@@ -77,17 +63,14 @@
 
 .auth-card__intro,
 .auth-card__support {
+  margin: 0.45rem 0 0;
   color: var(--auth-muted, var(--color-muted-600));
   line-height: 1.7;
 }
 
-.auth-card {
-  padding: clamp(5.25rem, 7vw, 5.85rem) clamp(1.65rem, 3vw, 2.4rem) clamp(1.55rem, 3vw, 2.15rem);
-  border-radius: var(--radius-lg);
-  justify-self: center;
-  transform: translateX(clamp(0rem, 22vw, 24rem));
-  width: min(100%, 34rem);
-  min-height: auto;
+.auth-logo img {
+  width: clamp(6.8rem, 12vw, 8.5rem);
+  filter: drop-shadow(0 0 24px rgba(255, 241, 118, 0.2));
 }
 
 .auth-field input {
@@ -216,25 +199,8 @@
   text-decoration: underline;
 }
 
-@media (max-width: 960px) {
-  .auth-shell {
-    grid-template-columns: 1fr;
-  }
-
-  .auth-card {
-    justify-self: center;
-    transform: none;
-    width: min(100%, 34rem);
-  }
-}
-
 @media (max-width: 720px) {
   .auth-page {
-    padding: 1rem;
-  }
-
-  .auth-brand {
-    width: 8.6rem;
-    transform: translateX(-50%);
+    background-attachment: scroll;
   }
 }
