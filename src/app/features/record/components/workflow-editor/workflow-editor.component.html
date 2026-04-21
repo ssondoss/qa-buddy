@@ -4,12 +4,12 @@
       <div>
         <p class="workflow-editor__eyebrow">Workflow Map</p>
         <h2>Human-readable execution flow</h2>
-        @if (steps().length) {
+        @if (steps.length) {
           <p class="workflow-editor__subtitle">
             Your latest recording is translated into named steps that are ready for payloads,
             screenshots, and API-aware validation hooks.
           </p>
-        } @else if (phase() === 'recording') {
+        } @else if (phase === 'recording') {
           <p class="workflow-editor__subtitle">
             Recording is live. Close Playwright when you are done and the visual workflow will
             appear here.
@@ -23,7 +23,7 @@
       </div>
 
       <div class="workflow-editor__stats">
-        @for (stat of headlineStats(); track stat.label) {
+        @for (stat of headlineStats; track stat.label) {
           <span class="workflow-editor__stat" [attr.data-tone]="stat.tone">
             <strong>{{ stat.value }}</strong>
             <span>{{ stat.label }}</span>
@@ -32,9 +32,9 @@
       </div>
     </header>
 
-    @if (steps().length) {
+    @if (steps.length) {
       <ol class="workflow-timeline">
-        @for (step of steps(); track step.id) {
+        @for (step of steps; track step.id) {
           <li
             class="workflow-step"
             [attr.data-kind]="step.kind"
@@ -70,23 +70,23 @@
         }
       </ol>
     } @else {
-      <div class="workflow-empty" [attr.data-phase]="phase()">
+      <div class="workflow-empty" [attr.data-phase]="phase">
         <p class="workflow-empty__eyebrow">
-          @if (phase() === 'recording') {
+          @if (phase === 'recording') {
             Listening for recorded actions
           } @else {
             Workflow editor standing by
           }
         </p>
         <h3>
-          @if (phase() === 'recording') {
+          @if (phase === 'recording') {
             Waiting for the recording to finish
           } @else {
             No recorded steps yet
           }
         </h3>
         <p>
-          @if (phase() === 'recording') {
+          @if (phase === 'recording') {
             Once Playwright closes, we will convert the script into a visual checklist you can
             refine.
           } @else {
@@ -119,16 +119,16 @@
           <h3>Raw Playwright</h3>
         </div>
 
-        @if (script()) {
-          <span class="workflow-panel__meta">{{ lineCount() }} lines</span>
+        @if (script) {
+          <span class="workflow-panel__meta">{{ lineCount }} lines</span>
         }
       </div>
 
-      @if (script()) {
-        <pre>{{ script() }}</pre>
+      @if (script) {
+        <pre>{{ script }}</pre>
       } @else {
         <p class="workflow-panel__placeholder">
-          Record from {{ sourceUrl() || 'a URL of your choice' }} and the generated Playwright code
+          Record from {{ sourceUrl || 'a URL of your choice' }} and the generated Playwright code
           will land here.
         </p>
       }

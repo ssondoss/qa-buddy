@@ -1,4 +1,4 @@
-import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { WorkflowEditorComponent } from './components/workflow-editor/workflow-editor.component';
@@ -14,11 +14,14 @@ import { RecordService } from './services/record.service';
   styleUrl: './record.component.scss',
 })
 export class RecordComponent {
-  readonly url = signal('');
-  readonly phase = signal<RecordingPhase>('idle');
-  readonly generatedScript = signal<string | null>(null);
-  readonly error = signal<string | null>(null);
-  readonly workflowSteps = computed(() => this.workflowParser.parse(this.generatedScript()));
+  url = '';
+  phase: RecordingPhase = 'idle';
+  generatedScript: string | null = null;
+  error: string | null = null;
+
+  get workflowSteps() {
+    return this.workflowParser.parse(this.generatedScript);
+  }
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -28,15 +31,15 @@ export class RecordComponent {
   ) {}
 
   open(): void {
-    this.error.set(null);
-    this.generatedScript.set(null);
+    this.error = null;
+    this.generatedScript = null;
 
     this.recordService
-      .open({ url: this.url() })
+      .open({ url: this.url })
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (status) => {
-          this.phase.set(status.phase);
+          this.phase = status.phase;
 
           if (status.phase === 'idle' && status.hasResult) {
             this.recordService
@@ -44,13 +47,13 @@ export class RecordComponent {
               .pipe(takeUntilDestroyed(this.destroyRef))
               .subscribe({
                 next: (res) => {
-                  this.generatedScript.set(res.content);
+                  this.generatedScript = res.content;
                 },
-                error: (err) => this.error.set(err.error?.error ?? 'Failed to fetch result'),
+                error: (err) => this.error = err.error?.error ?? 'Failed to fetch result',
               });
           }
         },
-        error: (err) => this.error.set(err?.error ?? 'Failed to open browser'),
+        error: (err) => this.error = err?.error ?? 'Failed to open browser',
       });
   }
 }

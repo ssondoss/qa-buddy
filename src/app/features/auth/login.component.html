@@ -1,0 +1,70 @@
+<div class="auth-page position-relative min-vh-100">
+  <div class="auth-brand d-flex align-items-center justify-content-center" aria-hidden="true">
+    <img src="/logo.png" alt="QA Buddy logo" />
+  </div>
+
+  <section class="auth-shell d-flex align-items-center justify-content-center mx-auto">
+    <section class="auth-card d-grid gap-3">
+      <div>
+        <p class="auth-card__eyebrow">Login</p>
+        <h2>Welcome back</h2>
+        <p class="auth-card__intro">Sign in to continue.</p>
+      </div>
+
+      <form class="d-grid gap-3" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <label class="auth-field d-grid gap-2">
+          <span>Email</span>
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            [class.auth-field__control--invalid]="isFieldInvalid('email')"
+          />
+          @if (isFieldInvalid('email')) {
+            <small class="auth-field__error">
+              @if (form.controls.email.hasError('required')) {
+                Email is required.
+              } @else {
+                Enter a valid email address.
+              }
+            </small>
+          }
+        </label>
+
+        <label class="auth-field d-grid gap-2">
+          <span>Password</span>
+          <input
+            type="password"
+            formControlName="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            [class.auth-field__control--invalid]="isFieldInvalid('password')"
+          />
+          @if (isFieldInvalid('password')) {
+            <small class="auth-field__error">
+              @if (form.controls.password.hasError('required')) {
+                Password is required.
+              } @else {
+                Password must be 72 characters or fewer.
+              }
+            </small>
+          }
+        </label>
+
+        @if (error) {
+          <p class="auth-banner auth-banner--error mb-0">{{ error }}</p>
+        }
+
+        <button class="auth-submit" type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Signing in...' : 'Sign in' }}
+        </button>
+      </form>
+
+      <p class="auth-switch mb-0">
+        Need an account?
+        <a routerLink="/register">Create one</a>
+      </p>
+    </section>
+  </section>
+</div>

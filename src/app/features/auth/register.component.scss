@@ -1,0 +1,10 @@
+:host {
+  --auth-ink: var(--color-ink-850);
+  --auth-muted: var(--color-muted-650);
+  --auth-line: var(--color-line-soft);
+  --auth-panel: var(--color-panel);
+  --auth-accent: var(--color-orange-700);
+  --auth-accent-strong: var(--color-orange-500);
+  --auth-glow: var(--color-orange-glow);
+  display: block;
+}

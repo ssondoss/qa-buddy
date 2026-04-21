@@ -1,1 +1,68 @@
-/* You can add global styles to this file, and also import other style files */
+@use './app/features/auth/auth-shell';
+
+:root {
+  color-scheme: dark;
+
+  --font-sans: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-display: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
+
+  --color-ink-900: #f7f7ee;
+  --color-ink-850: #fffde3;
+  --color-muted-600: rgba(244, 244, 226, 0.72);
+  --color-muted-650: rgba(244, 244, 226, 0.66);
+  --color-line-soft: rgba(255, 241, 118, 0.18);
+  --color-panel: rgba(8, 9, 7, 0.58);
+  --color-panel-strong: rgba(255, 241, 118, 0.07);
+  --color-white-92: rgba(12, 14, 12, 0.76);
+
+  --color-neon-yellow: #fff176;
+  --color-neon-yellow-strong: #fff94a;
+  --color-neon-glow: rgba(255, 241, 118, 0.42);
+  --color-teal-700: var(--color-neon-yellow);
+  --color-teal-500: var(--color-neon-yellow-strong);
+  --color-teal-glow: var(--color-neon-glow);
+  --color-orange-700: var(--color-neon-yellow);
+  --color-orange-500: var(--color-neon-yellow-strong);
+  --color-orange-glow: var(--color-neon-glow);
+
+  --color-danger-700: #ffb4a9;
+  --color-danger-600: #ff8f82;
+  --color-danger-line: rgba(255, 143, 130, 0.46);
+  --color-danger-surface: rgba(103, 21, 16, 0.72);
+  --color-danger-surface-soft: rgba(103, 21, 16, 0.34);
+  --color-success-700: #ccff90;
+  --color-success-surface: rgba(118, 255, 3, 0.12);
+
+  --shadow-panel:
+    0 28px 100px rgba(0, 0, 0, 0.56),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --shadow-accent: 0 18px 48px rgba(255, 241, 118, 0.24);
+  --radius-xl: 2.2rem;
+  --radius-lg: 1.8rem;
+  --radius-md: 1.2rem;
+  --radius-sm: 1rem;
+
+  --gradient-auth-page:
+    radial-gradient(circle at 50% 48%, rgba(0, 0, 0, 0.08), transparent 24%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.08) 46%, rgba(0, 0, 0, 0.32)),
+    radial-gradient(circle at 18% 18%, rgba(255, 241, 118, 0.1), transparent 24%),
+    url('/bg-main.png');
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-ink-900);
+  background: #030403;
+}

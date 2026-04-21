@@ -1,4 +1,4 @@
-import { Component, computed, input } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import type { RecordingPhase } from '../../models/record-contract.model';
 import type {
   WorkflowCapability,
@@ -14,10 +14,10 @@ import type {
   styleUrl: './workflow-editor.component.scss',
 })
 export class WorkflowEditorComponent {
-  readonly steps = input<readonly WorkflowStep[]>([]);
-  readonly script = input<string | null>(null);
-  readonly phase = input<RecordingPhase>('idle');
-  readonly sourceUrl = input('');
+  @Input() steps: readonly WorkflowStep[] = [];
+  @Input() script: string | null = null;
+  @Input() phase: RecordingPhase = 'idle';
+  @Input() sourceUrl = '';
 
   protected readonly kindLabels: Record<WorkflowStepKind, string> = {
     navigate: 'Navigate',
@@ -34,8 +34,8 @@ export class WorkflowEditorComponent {
     apiChecks: 'API check slot',
   };
 
-  protected readonly headlineStats = computed(() => {
-    const steps = this.steps();
+  protected get headlineStats() {
+    const steps = this.steps;
     const interactive = steps.filter((step) => step.kind === 'click' || step.kind === 'input').length;
     const validations = steps.filter((step) => step.kind === 'assert').length;
 
@@ -44,9 +44,11 @@ export class WorkflowEditorComponent {
       { label: 'interactive actions', value: interactive, tone: 'action' },
       { label: 'checks ready', value: validations, tone: 'verify' },
     ];
-  });
+  }
 
-  protected readonly lineCount = computed(() => this.script()?.split('\n').length ?? 0);
+  protected get lineCount(): number {
+    return this.script?.split('\n').length ?? 0;
+  }
 
   protected locatorLabel(locator: WorkflowLocator): string {
     return `${locator.strategy} · ${locator.value}`;

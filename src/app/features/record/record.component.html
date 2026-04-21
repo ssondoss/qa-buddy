@@ -13,17 +13,17 @@
       <div class="record-hero__stats">
         <article class="record-metric">
           <span>Workflow steps</span>
-          <strong>{{ workflowSteps().length }}</strong>
+          <strong>{{ workflowSteps.length }}</strong>
         </article>
 
         <article class="record-metric">
           <span>Current mode</span>
-          <strong>{{ phase() === 'recording' ? 'Live capture' : 'Ready' }}</strong>
+          <strong>{{ phase === 'recording' ? 'Live capture' : 'Ready' }}</strong>
         </article>
 
         <article class="record-metric">
           <span>Raw script</span>
-          <strong>{{ generatedScript() ? 'Captured' : 'Waiting' }}</strong>
+          <strong>{{ generatedScript ? 'Captured' : 'Waiting' }}</strong>
         </article>
       </div>
     </header>
@@ -34,36 +34,36 @@
           <span>Starting URL</span>
           <input
             type="url"
-            [ngModel]="url()"
-            (ngModelChange)="url.set($event)"
+            [ngModel]="url"
+            (ngModelChange)="url = $event"
             placeholder="https://example.com"
-            [disabled]="phase() !== 'idle'"
+            [disabled]="phase !== 'idle'"
           />
         </label>
 
-        <button (click)="open()" [disabled]="phase() !== 'idle' || !url().trim()">
-          {{ phase() === 'recording' ? 'Recording in progress' : 'Open Playwright' }}
+        <button (click)="open()" [disabled]="phase !== 'idle' || !url.trim()">
+          {{ phase === 'recording' ? 'Recording in progress' : 'Open Playwright' }}
         </button>
       </div>
 
       <div class="record-console__status">
-        <span class="record-pill" [attr.data-phase]="phase()">
-          {{ phase() === 'recording' ? 'Playwright is recording' : 'Ready for a new capture' }}
+        <span class="record-pill" [attr.data-phase]="phase">
+          {{ phase === 'recording' ? 'Playwright is recording' : 'Ready for a new capture' }}
         </span>
-        <span class="record-pill record-pill--muted">Signals-powered UI</span>
+        <span class="record-pill record-pill--muted">Zone.js-powered UI</span>
         <span class="record-pill record-pill--muted">Workflow-first review</span>
       </div>
     </section>
 
-    @if (error()) {
-      <p class="record-error">{{ error() }}</p>
+    @if (error) {
+      <p class="record-error">{{ error }}</p>
     }
 
     <app-workflow-editor
-      [steps]="workflowSteps()"
-      [script]="generatedScript()"
-      [phase]="phase()"
-      [sourceUrl]="url()"
+      [steps]="workflowSteps"
+      [script]="generatedScript"
+      [phase]="phase"
+      [sourceUrl]="url"
     />
   </div>
 </div>
