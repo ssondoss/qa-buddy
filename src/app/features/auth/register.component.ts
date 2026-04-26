@@ -3,13 +3,14 @@ import { Component, DestroyRef, OnDestroy, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { PortfolioFooterComponent } from '../../shared/components/portfolio-footer/portfolio-footer.component';
 import { AuthService } from './auth.service';
 import { ApiErrorResponse } from './models/auth.model';
 
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, PortfolioFooterComponent],
   templateUrl: './register.component.html',
   styleUrl: './register.component.scss',
 })

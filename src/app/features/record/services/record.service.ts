@@ -13,16 +13,17 @@ export class RecordService {
 
   constructor(private http: HttpClient) {}
 
-  open({ url }: RecordOpenBody): Observable<RecordingStatus> {
+  open({ url, workflowId }: RecordOpenBody): Observable<RecordingStatus> {
     return new Observable((observer) => {
       const controller = new AbortController();
       const decoder = new TextDecoder();
       let buffer = '';
+      const body: RecordOpenBody = workflowId ? { url, workflowId } : { url };
 
       fetch(`${this.base}/open`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url }),
+        body: JSON.stringify(body),
         signal: controller.signal,
       })
         .then(async (response) => {

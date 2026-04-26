@@ -3,13 +3,14 @@ import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { PortfolioFooterComponent } from '../../shared/components/portfolio-footer/portfolio-footer.component';
 import { AuthService } from './auth.service';
 import { ApiErrorResponse, AUTH_TOKEN_STORAGE_KEY } from './models/auth.model';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink, PortfolioFooterComponent],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })

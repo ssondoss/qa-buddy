@@ -1,0 +1,102 @@
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: WorkflowEditorComponent is not used within the template of RecordComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/record.component.ts:23:25:
+[37m      23 │   imports: [FormsModule, [32mWorkflowEditorComponent[37m],
+         ╵                          [32m~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Unexpected closing tag "div". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/record.component.html:175:4:
+[37m      175 │     [32m</div>[37m
+          ╵     [32m~~~~~~[0m
+
+  Error occurs in the template of component RecordComponent.
+
+    src/app/features/record/record.component.ts:24:15:
+[37m      24 │   templateUrl: [32m'./record.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Unexpected closing tag "header". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/record.component.html:176:2:
+[37m      176 │   [32m</header>[37m
+          ╵   [32m~~~~~~~~~[0m
+
+  Error occurs in the template of component RecordComponent.
+
+    src/app/features/record/record.component.ts:24:15:
+[37m      24 │   templateUrl: [32m'./record.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Unexpected closing tag "section". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/record.component.html:312:0:
+[37m      312 │ [32m</section>[37m
+          ╵ [32m~~~~~~~~~~[0m
+
+  Error occurs in the template of component RecordComponent.
+
+    src/app/features/record/record.component.ts:24:15:
+[37m      24 │   templateUrl: [32m'./record.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find template file './record.component.html'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/record.component.ts:24:15:
+[37m      24 │   templateUrl: [32m'./record.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find template file './record.component.html'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/record.component.ts:24:15:
+[37m      24 │   templateUrl: [32m'./record.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find stylesheet file './workflow-editor.component.scss'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/components/workflow-editor/workflow-editor.component.ts:19:12:
+[37m      19 │   styleUrl: [32m'./workflow-editor.component.scss'[37m,
+         ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find stylesheet file './workflow-editor.component.scss'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/components/workflow-editor/workflow-editor.component.ts:19:12:
+[37m      19 │   styleUrl: [32m'./workflow-editor.component.scss'[37m,
+         ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find stylesheet file './workflow-editor.component.scss'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/components/workflow-editor/workflow-editor.component.ts:19:12:
+[37m      19 │   styleUrl: [32m'./workflow-editor.component.scss'[37m,
+         ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find stylesheet file './workflow-editor.component.scss'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/components/workflow-editor/workflow-editor.component.ts:19:12:
+[37m      19 │   styleUrl: [32m'./workflow-editor.component.scss'[37m,
+         ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find stylesheet file './workflow-editor.component.scss'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/components/workflow-editor/workflow-editor.component.ts:19:12:
+[37m      19 │   styleUrl: [32m'./workflow-editor.component.scss'[37m,
+         ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG2008: Could not find stylesheet file './workflow-editor.component.scss'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/record/components/workflow-editor/workflow-editor.component.ts:19:12:
+[37m      19 │   styleUrl: [32m'./workflow-editor.component.scss'[37m,
+         ╵             [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m

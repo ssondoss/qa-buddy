@@ -1,0 +1,28 @@
+<div class="dashboard-shell">
+  <aside class="dashboard-sidebar">
+    <a class="dashboard-brand" routerLink="/dashboard/workflows">
+      <img src="/logo-3d.png" alt="QA Buddy logo" />
+      <span>QA Buddy</span>
+    </a>
+
+    <nav class="dashboard-nav" aria-label="Dashboard">
+      @for (item of navItems; track item.route) {
+        <a
+          class="dashboard-nav__link"
+          [routerLink]="item.route"
+          routerLinkActive="dashboard-nav__link--active"
+        >
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="dashboard-sidebar__footer">
+      <a class="dashboard-nav__link dashboard-nav__link--muted" routerLink="/login">Sign out</a>
+    </div>
+  </aside>
+
+  <main class="dashboard-main">
+    <router-outlet />
+  </main>
+</div>

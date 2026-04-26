@@ -10,3 +10,5 @@ import { RouterOutlet } from '@angular/router';
 export class App {
   protected readonly title = 'qa-buddy-frontend';
 }
+
+//Avro or Protobuf

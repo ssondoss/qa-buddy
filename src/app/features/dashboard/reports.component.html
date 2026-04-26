@@ -1,0 +1,70 @@
+<section class="report-page">
+  <header class="report-page__header">
+    <h1>Reports</h1>
+
+    <div class="report-page__actions">
+      <button class="report-button report-button--primary" type="button">Generate Report</button>
+      <button class="report-button" type="button">Export PDF</button>
+      <button class="report-button" type="button">Share</button>
+    </div>
+  </header>
+
+  <section class="report-metrics">
+    @for (metric of metrics; track metric.label) {
+      <article class="report-panel report-metric">
+        <span>{{ metric.label }}</span>
+        <strong>{{ metric.value }}</strong>
+      </article>
+    }
+  </section>
+
+  <section class="report-grid">
+    <section class="report-panel">
+      <header class="report-panel__header">
+        <h2>Generated Reports</h2>
+      </header>
+
+      <div class="report-table-wrap">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Period</th>
+              <th>Owner</th>
+              <th>Generated</th>
+              <th>Format</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (report of reports; track report.name) {
+              <tr>
+                <td>{{ report.name }}</td>
+                <td>{{ report.period }}</td>
+                <td>{{ report.owner }}</td>
+                <td>{{ report.generatedAt }}</td>
+                <td>{{ report.format }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <aside class="report-panel report-side">
+      <h2>Distribution</h2>
+
+      <article class="report-side__item">
+        <span>Passed</span>
+        <strong>91%</strong>
+      </article>
+      <article class="report-side__item">
+        <span>Failed</span>
+        <strong>7%</strong>
+      </article>
+      <article class="report-side__item">
+        <span>Skipped</span>
+        <strong>2%</strong>
+      </article>
+    </aside>
+  </section>
+</section>

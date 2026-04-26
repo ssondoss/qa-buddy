@@ -1,12 +1,32 @@
-<div class="auth-page position-relative min-vh-100">
-  <section class="container min-vh-100 d-flex align-items-center py-4">
-    <div class="row w-100 justify-content-center justify-content-lg-end">
-      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-        <section class="auth-card d-grid gap-3">
-          <div class="auth-logo d-flex justify-content-center">
-            <img class="img-fluid" src="/logo.png" alt="QA Buddy logo" />
+<div class="auth-page position-relative min-vh-100 d-flex flex-column">
+  <main class="container flex-grow-1 d-flex align-items-center py-4">
+    <div class="row w-100 align-items-center justify-content-center justify-content-lg-between g-4">
+      <div class="col-12 col-lg-5">
+        <section class="auth-story">
+          <div class="auth-brand">
+            <img src="/logo-3d.png" alt="QA Buddy logo" />
+            <div>
+              <strong>QA Buddy</strong>
+              <span>Testing workspace</span>
+            </div>
           </div>
 
+          <h1>Keep every test run <span class="auth-highlight">clear.</span></h1>
+          <p>
+            Sign in to continue recording workflows, tracking executions, and reviewing your QA
+            activity in one focused dark workspace.
+          </p>
+
+          <div class="auth-highlights" aria-label="QA Buddy highlights">
+            <span>Clean records</span>
+            <span>Readable reports</span>
+            <span>Less visual noise</span>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <section class="auth-card d-grid gap-3">
           <div>
             <p class="auth-card__eyebrow">Login</p>
             <h2>Welcome back</h2>
@@ -70,5 +90,7 @@
         </section>
       </div>
     </div>
-  </section>
+  </main>
+
+  <app-portfolio-footer />
 </div>

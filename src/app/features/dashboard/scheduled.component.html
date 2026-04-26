@@ -1,0 +1,57 @@
+<section class="sched-page">
+  <header class="sched-page__header">
+    <h1>Scheduled</h1>
+
+    <div class="sched-page__actions">
+      <button class="sched-button sched-button--primary" type="button">New Schedule</button>
+      <button class="sched-button" type="button">Pause All</button>
+      <button class="sched-button" type="button">Export</button>
+    </div>
+  </header>
+
+  <section class="sched-metrics">
+    @for (metric of metrics; track metric.label) {
+      <article class="sched-panel sched-metric">
+        <span>{{ metric.label }}</span>
+        <strong>{{ metric.value }}</strong>
+      </article>
+    }
+  </section>
+
+  <section class="sched-panel">
+    <header class="sched-panel__header">
+      <h2>Schedules</h2>
+    </header>
+
+    <div class="sched-table-wrap">
+      <table class="sched-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Workflow</th>
+            <th>Environment</th>
+            <th>Cadence</th>
+            <th>Next Run</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (schedule of schedules; track schedule.name) {
+            <tr>
+              <td>{{ schedule.name }}</td>
+              <td>{{ schedule.workflow }}</td>
+              <td>{{ schedule.environment }}</td>
+              <td><code>{{ schedule.cadence }}</code></td>
+              <td>{{ schedule.nextRun }}</td>
+              <td>
+                <span class="sched-pill" [attr.data-status]="schedule.status.toLowerCase()">
+                  {{ schedule.status }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

@@ -1,0 +1,33 @@
+:host {
+  display: block;
+}
+
+.portfolio-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(7, 10, 16, 0.72);
+  color: var(--color-muted-600);
+  font-size: 0.82rem;
+  backdrop-filter: blur(14px);
+}
+
+.portfolio-footer__inner {
+  min-height: 3.75rem;
+}
+
+.portfolio-footer__logo {
+  width: 3rem;
+  height: auto;
+  padding-left: 6px;
+  filter: drop-shadow(0 8px 18px rgba(246, 215, 84, 0.12));
+}
+
+.portfolio-footer a {
+  color: var(--color-primary-yellow);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.portfolio-footer a:hover {
+  color: var(--color-primary-yellow-strong);
+  text-decoration: underline;
+}

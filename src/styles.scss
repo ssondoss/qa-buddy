@@ -3,27 +3,32 @@
 :root {
   color-scheme: dark;
 
-  --font-sans: 'Space Grotesk', 'Avenir Next', 'Segoe UI', sans-serif;
-  --font-display: 'Sora', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-sans: 'Inter', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-display: 'Inter', 'Avenir Next', 'Segoe UI', sans-serif;
 
-  --color-ink-900: #f7f7ee;
-  --color-ink-850: #fffde3;
-  --color-muted-600: rgba(244, 244, 226, 0.72);
-  --color-muted-650: rgba(244, 244, 226, 0.66);
-  --color-line-soft: rgba(255, 241, 118, 0.18);
-  --color-panel: rgba(8, 9, 7, 0.58);
-  --color-panel-strong: rgba(255, 241, 118, 0.07);
-  --color-white-92: rgba(12, 14, 12, 0.76);
+  --color-ink-900: #f8fafc;
+  --color-ink-850: #e5e7eb;
+  --color-muted-600: #a7b0bf;
+  --color-muted-650: #8b95a5;
+  --color-line-soft: rgba(255, 255, 255, 0.1);
+  --color-panel: rgba(17, 24, 39, 0.84);
+  --color-panel-strong: #121826;
+  --color-white-92: rgba(255, 255, 255, 0.92);
 
-  --color-neon-yellow: #fff176;
-  --color-neon-yellow-strong: #fff94a;
-  --color-neon-glow: rgba(255, 241, 118, 0.42);
-  --color-teal-700: var(--color-neon-yellow);
-  --color-teal-500: var(--color-neon-yellow-strong);
-  --color-teal-glow: var(--color-neon-glow);
-  --color-orange-700: var(--color-neon-yellow);
-  --color-orange-500: var(--color-neon-yellow-strong);
-  --color-orange-glow: var(--color-neon-glow);
+  --color-primary-yellow: #f6d754;
+  --color-primary-yellow-strong: #ffe680;
+  --color-primary-yellow-soft: rgba(246, 215, 84, 0.14);
+  --color-accent-cyan: #35d0ba;
+  --color-accent-cyan-soft: rgba(53, 208, 186, 0.16);
+  --color-neon-yellow: var(--color-primary-yellow);
+  --color-neon-yellow-strong: var(--color-primary-yellow-strong);
+  --color-neon-glow: rgba(246, 215, 84, 0.24);
+  --color-teal-700: var(--color-accent-cyan);
+  --color-teal-500: #67e8d7;
+  --color-teal-glow: var(--color-accent-cyan-soft);
+  --color-orange-700: var(--color-primary-yellow);
+  --color-orange-500: var(--color-primary-yellow-strong);
+  --color-orange-glow: var(--color-primary-yellow-soft);
 
   --color-danger-700: #ffb4a9;
   --color-danger-600: #ff8f82;
@@ -34,19 +39,41 @@
   --color-success-surface: rgba(118, 255, 3, 0.12);
 
   --shadow-panel:
-    0 28px 100px rgba(0, 0, 0, 0.56),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  --shadow-accent: 0 18px 48px rgba(255, 241, 118, 0.24);
-  --radius-xl: 2.2rem;
-  --radius-lg: 1.8rem;
-  --radius-md: 1.2rem;
-  --radius-sm: 1rem;
+    0 24px 70px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --shadow-accent: 0 14px 32px rgba(246, 215, 84, 0.18);
+  --radius-xl: 8px;
+  --radius-lg: 8px;
+  --radius-md: 8px;
+  --radius-sm: 8px;
 
   --gradient-auth-page:
-    radial-gradient(circle at 50% 48%, rgba(0, 0, 0, 0.08), transparent 24%),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.08) 46%, rgba(0, 0, 0, 0.32)),
-    radial-gradient(circle at 18% 18%, rgba(255, 241, 118, 0.1), transparent 24%),
-    url('/bg-main.png');
+    linear-gradient(120deg, rgba(246, 215, 84, 0.08), transparent 28%),
+    linear-gradient(300deg, rgba(53, 208, 186, 0.08), transparent 32%),
+    linear-gradient(180deg, #070a10 0%, #0b111b 52%, #080b11 100%);
+
+  --dashboard-bg-950: #07090c;
+  --dashboard-bg-930: #0d1117;
+  --dashboard-bg-900: #11161d;
+  --dashboard-bg-870: #161c24;
+  --dashboard-bg-840: #1b2430;
+  --dashboard-panel: rgba(15, 20, 28, 0.94);
+  --dashboard-panel-raised: rgba(22, 29, 39, 0.96);
+  --dashboard-border: rgba(148, 163, 184, 0.14);
+  --dashboard-border-strong: rgba(148, 163, 184, 0.24);
+  --dashboard-muted: #94a3b8;
+  --dashboard-muted-soft: #64748b;
+  --dashboard-primary: #f6d754;
+  --dashboard-primary-strong: #ffe77a;
+  --dashboard-primary-soft: rgba(246, 215, 84, 0.14);
+  --dashboard-primary-ring: rgba(246, 215, 84, 0.26);
+  --dashboard-success: #2dd4bf;
+  --dashboard-success-soft: rgba(45, 212, 191, 0.14);
+  --dashboard-info: #60a5fa;
+  --dashboard-info-soft: rgba(96, 165, 250, 0.14);
+  --dashboard-danger: #fb7185;
+  --dashboard-danger-soft: rgba(251, 113, 133, 0.14);
+  --dashboard-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
 }
 
 *,
@@ -64,5 +91,108 @@ body {
   margin: 0;
   font-family: var(--font-sans);
   color: var(--color-ink-900);
-  background: #030403;
+  background: #070a10;
+}
+
+.workflows-button {
+  min-height: 2.65rem;
+  padding: 0 0.95rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-ink-850);
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.workflows-button:hover:not(:disabled),
+.workflows-button:focus-visible:not(:disabled) {
+  border-color: rgba(246, 215, 84, 0.26);
+  background: rgba(246, 215, 84, 0.1);
+}
+
+.workflows-button--primary {
+  border-color: transparent;
+  background: var(--color-primary-yellow);
+  color: #111827;
+  box-shadow: var(--shadow-accent);
+}
+
+.workflows-button--primary:hover:not(:disabled),
+.workflows-button--primary:focus-visible:not(:disabled) {
+  background: var(--color-primary-yellow-strong);
+}
+
+.workflows-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.workflows-field {
+  display: grid;
+  gap: 0.45rem;
+  flex: 1 1 18rem;
+}
+
+.workflows-field span {
+  color: var(--dashboard-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workflows-field input,
+.workflows-field select,
+.workflows-field textarea {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  background: rgba(3, 7, 18, 0.72);
+  color: var(--color-ink-900);
+  outline: none;
+}
+
+.workflows-field textarea {
+  min-height: 7.5rem;
+  padding-top: 0.85rem;
+  resize: vertical;
+}
+
+.workflows-field select {
+  cursor: pointer;
+}
+
+.workflows-field input:focus,
+.workflows-field select:focus,
+.workflows-field textarea:focus {
+  border-color: var(--color-primary-yellow);
+  box-shadow: 0 0 0 3px var(--color-primary-yellow-soft);
+}
+
+.workflows-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.85rem;
+  padding: 0 0.62rem;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--dashboard-muted);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.workflows-pill[data-status='active'],
+.workflows-pill[data-status='idle'],
+.workflows-pill[data-status='recording'] {
+  background: var(--color-accent-cyan-soft);
+  color: var(--color-accent-cyan);
+}
+
+.workflows-pill[data-status='review'] {
+  background: var(--color-primary-yellow-soft);
+  color: var(--color-primary-yellow);
 }

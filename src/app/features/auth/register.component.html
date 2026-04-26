@@ -1,12 +1,32 @@
-<div class="auth-page position-relative min-vh-100">
-  <section class="container min-vh-100 d-flex align-items-center py-4">
-    <div class="row w-100 justify-content-center justify-content-lg-end">
-      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
-        <section class="auth-card d-grid gap-3">
-          <div class="auth-logo d-flex justify-content-center">
-            <img class="img-fluid" src="/logo.png" alt="QA Buddy logo" />
+<div class="auth-page position-relative min-vh-100 d-flex flex-column">
+  <main class="container flex-grow-1 d-flex align-items-center py-4">
+    <div class="row w-100 align-items-center justify-content-center justify-content-lg-between g-4">
+      <div class="col-12 col-lg-5">
+        <section class="auth-story">
+          <div class="auth-brand">
+            <img src="/logo-3d.png" alt="QA Buddy logo" />
+            <div>
+              <strong>QA Buddy</strong>
+              <span>Testing workspace</span>
+            </div>
           </div>
 
+          <h1>Start testing with <span class="auth-highlight">clarity.</span></h1>
+          <p>
+            Create a focused workspace for recording flows, reviewing runs, and keeping quality
+            work easy to follow.
+          </p>
+
+          <div class="auth-highlights" aria-label="QA Buddy highlights">
+            <span>Dark workspace</span>
+            <span>Fast setup</span>
+            <span>Team-ready flows</span>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+        <section class="auth-card d-grid gap-3">
           <div>
             <p class="auth-card__eyebrow">Register</p>
             <h2>Create account</h2>
@@ -107,5 +127,7 @@
         </section>
       </div>
     </div>
-  </section>
+  </main>
+
+  <app-portfolio-footer />
 </div>

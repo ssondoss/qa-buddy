@@ -1,0 +1,250 @@
+<section class="workflows-page">
+  <header class="workflows-toolbar">
+    <div>
+      <p class="workflows-eyebrow">Workspace</p>
+      <h1>Workflows</h1>
+    </div>
+
+    <button
+      class="workflows-button workflows-button--primary"
+      type="button"
+      (click)="openCreateWorkflow()"
+    >
+      New Workflow
+    </button>
+  </header>
+
+  @if (showWorkflowForm) {
+    <section class="workflows-panel workflows-panel--create">
+      <header class="workflows-panel__header">
+        <div>
+          <p class="workflows-eyebrow">New workflow</p>
+          <h2>Create a workflow</h2>
+        </div>
+      </header>
+
+      <form class="workflows-create-form" [formGroup]="workflowForm" (ngSubmit)="createWorkflow()" novalidate>
+        <label class="workflows-field">
+          <span>Name</span>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Checkout regression"
+            maxlength="160"
+            [class.workflows-field__control--invalid]="isWorkflowFieldInvalid('name')"
+          />
+          @if (isWorkflowFieldInvalid('name')) {
+            <small class="workflows-field__error">
+              @if (workflowForm.controls.name.hasError('required')) {
+                Workflow name is required.
+              } @else {
+                Use 160 characters or fewer.
+              }
+            </small>
+          }
+        </label>
+
+        <label class="workflows-field">
+          <span>Description</span>
+          <textarea
+            formControlName="description"
+            placeholder="What this recording should cover"
+            maxlength="2000"
+            [class.workflows-field__control--invalid]="isWorkflowFieldInvalid('description')"
+          ></textarea>
+          @if (isWorkflowFieldInvalid('description')) {
+            <small class="workflows-field__error">Use 2000 characters or fewer.</small>
+          }
+        </label>
+
+        <div class="workflows-create-form__actions">
+          <button class="workflows-button workflows-button--primary" type="submit" [disabled]="isCreatingWorkflow">
+            {{ isCreatingWorkflow ? 'Creating...' : 'Create Workflow' }}
+          </button>
+          <button class="workflows-button" type="button" (click)="closeCreateWorkflow()" [disabled]="isCreatingWorkflow">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  @if (error) {
+    <p class="workflows-error">{{ error }}</p>
+  }
+
+  @if (workflowError) {
+    <p class="workflows-error">{{ workflowError }}</p>
+  }
+
+  @if (workflowSuccess) {
+    <p class="workflows-success">{{ workflowSuccess }}</p>
+  }
+
+  <section class="workflows-summary" aria-label="Workflow metrics">
+    @for (metric of metrics; track metric.label) {
+      <article class="workflows-metric">
+        <span>{{ metric.label }}</span>
+        <strong>{{ metric.value }}</strong>
+      </article>
+    }
+  </section>
+
+  <section class="workflows-layout">
+    <section class="workflows-panel workflows-panel--list">
+      <header class="workflows-panel__header">
+        <div>
+          <p class="workflows-eyebrow">Library</p>
+          <h2>Workflow list</h2>
+        </div>
+        <span class="workflows-panel__meta">{{ workflows.length }} saved</span>
+      </header>
+
+      @if (workflows.length) {
+        <div class="workflows-table-wrap">
+          <table class="workflows-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Owner</th>
+                <th>Environment</th>
+                <th>Steps</th>
+                <th>Last Run</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (workflow of workflows; track workflow.id) {
+                <tr
+                  [class.workflows-table__row--active]="workflow.id === selectedWorkflowId"
+                  (click)="selectWorkflow(workflow.id)"
+                >
+                  <td>
+                    <strong>{{ workflow.name }}</strong>
+                    <small>{{ workflow.description }}</small>
+                  </td>
+                  <td>{{ workflow.owner }}</td>
+                  <td>{{ workflow.environment }}</td>
+                  <td>{{ workflow.stepCount }}</td>
+                  <td>{{ workflow.lastRun }}</td>
+                  <td>
+                    <span class="workflows-pill" [attr.data-status]="workflow.status.toLowerCase()">
+                      {{ workflow.status }}
+                    </span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="workflows-empty">Create a workflow to start recording.</div>
+      }
+    </section>
+
+    <aside class="workflows-side">
+      <section class="workflows-panel workflows-panel--capture">
+        <header class="workflows-panel__header">
+          <div>
+            <p class="workflows-eyebrow">Recorder</p>
+            <h2>Capture</h2>
+          </div>
+
+          <span class="workflows-pill" [attr.data-status]="phase === 'recording' ? 'recording' : 'idle'">
+            {{ phase === 'recording' ? 'Recording' : 'Ready' }}
+          </span>
+        </header>
+
+        <div class="workflows-capture">
+          <label class="workflows-field">
+            <span>Workflow</span>
+            <select
+              [ngModel]="selectedWorkflowId"
+              (ngModelChange)="selectWorkflow($event)"
+              [disabled]="phase !== 'idle'"
+            >
+              @for (workflow of workflows; track workflow.id) {
+                <option [value]="workflow.id">{{ workflow.name }}</option>
+              }
+            </select>
+          </label>
+
+          <label class="workflows-field">
+            <span>Start URL</span>
+            <input
+              type="url"
+              [ngModel]="url"
+              (ngModelChange)="url = $event"
+              placeholder="https://example.com"
+              [disabled]="phase !== 'idle'"
+            />
+          </label>
+
+          <button
+            class="workflows-button workflows-button--primary"
+            type="button"
+            (click)="open()"
+            [disabled]="phase !== 'idle' || !url.trim() || !selectedWorkflow"
+          >
+            {{ phase === 'recording' ? 'Recording...' : 'Start Recording' }}
+          </button>
+        </div>
+      </section>
+
+      <section class="workflows-panel workflows-panel--details">
+        @if (selectedWorkflow; as workflow) {
+          <header class="workflows-panel__header">
+            <div>
+              <p class="workflows-eyebrow">Selected</p>
+              <h2>{{ workflow.name }}</h2>
+            </div>
+
+            <span class="workflows-pill" [attr.data-status]="workflow.status.toLowerCase()">
+              {{ workflow.status }}
+            </span>
+          </header>
+
+          <dl class="workflow-info">
+            <div class="workflow-info__wide">
+              <dt>Description</dt>
+              <dd>{{ workflow.description }}</dd>
+            </div>
+            <div>
+              <dt>Owner</dt>
+              <dd>{{ workflow.owner }}</dd>
+            </div>
+            <div>
+              <dt>Environment</dt>
+              <dd>{{ workflow.environment }}</dd>
+            </div>
+            <div>
+              <dt>Steps</dt>
+              <dd>{{ workflow.stepCount }}</dd>
+            </div>
+            <div>
+              <dt>Schedule</dt>
+              <dd>{{ workflow.schedule }}</dd>
+            </div>
+            <div>
+              <dt>Last Run</dt>
+              <dd>{{ workflow.lastRun }}</dd>
+            </div>
+          </dl>
+        } @else {
+          <div class="workflows-empty">No workflow selected.</div>
+        }
+      </section>
+    </aside>
+  </section>
+
+  <section class="workflows-section-heading">
+    <h2>Recorded workflow</h2>
+  </section>
+
+  <app-workflow-editor
+    [steps]="workflowSteps"
+    [script]="generatedScript"
+    [phase]="phase"
+    [sourceUrl]="url"
+  />
+</section>

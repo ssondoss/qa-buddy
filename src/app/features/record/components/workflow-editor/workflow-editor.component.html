@@ -1,137 +1,119 @@
-<section class="workflow-editor">
-  <div class="workflow-editor__main">
-    <header class="workflow-editor__header">
+<section class="workflow-review">
+  <section class="workflow-review__panel">
+    <header class="workflow-review__header">
       <div>
-        <p class="workflow-editor__eyebrow">Workflow Map</p>
-        <h2>Human-readable execution flow</h2>
-        @if (steps.length) {
-          <p class="workflow-editor__subtitle">
-            Your latest recording is translated into named steps that are ready for payloads,
-            screenshots, and API-aware validation hooks.
-          </p>
-        } @else if (phase === 'recording') {
-          <p class="workflow-editor__subtitle">
-            Recording is live. Close Playwright when you are done and the visual workflow will
-            appear here.
-          </p>
-        } @else {
-          <p class="workflow-editor__subtitle">
-            Start from a URL, record the journey once, and this canvas will turn the raw script
-            into editable QA steps.
-          </p>
-        }
+        <p class="workflow-review__eyebrow">Steps</p>
+        <h2>Recorded steps</h2>
       </div>
 
-      <div class="workflow-editor__stats">
-        @for (stat of headlineStats; track stat.label) {
-          <span class="workflow-editor__stat" [attr.data-tone]="stat.tone">
-            <strong>{{ stat.value }}</strong>
-            <span>{{ stat.label }}</span>
-          </span>
+      <div class="workflow-review__actions">
+        @for (action of quickAddActions; track action.label; let isFirst = $first) {
+          <button
+            class="workflow-action"
+            [class.workflow-action--primary]="isFirst"
+            type="button"
+          >
+            {{ action.label }}
+          </button>
         }
       </div>
     </header>
 
     @if (steps.length) {
-      <ol class="workflow-timeline">
+      <div class="workflow-step-list">
         @for (step of steps; track step.id) {
-          <li
-            class="workflow-step"
-            [attr.data-kind]="step.kind"
-            [style.--step-index]="step.order"
+          <button
+            class="workflow-step-list__item"
+            type="button"
+            [class.workflow-step-list__item--active]="isSelected(step.id)"
+            (click)="selectStep(step.id)"
           >
-            <div class="workflow-step__rail" aria-hidden="true">
-              <span class="workflow-step__dot"></span>
-            </div>
-
-            <article class="workflow-step__card">
-              <div class="workflow-step__topline">
-                <span class="workflow-step__index">{{ step.order }}</span>
-                <span class="workflow-step__badge">{{ kindLabels[step.kind] }}</span>
-                <span class="workflow-step__line-ref">Line {{ step.sourceLine }}</span>
-              </div>
-
-              <h3>{{ step.title }}</h3>
-              <p class="workflow-step__detail">{{ step.detail }}</p>
-
-              @if (step.locator) {
-                <p class="workflow-step__locator">{{ locatorLabel(step.locator) }}</p>
-              }
-
-              <code class="workflow-step__code">{{ step.code }}</code>
-
-              <div class="workflow-step__capabilities">
-                @for (capability of step.capabilities; track capability) {
-                  <span>{{ capabilityLabels[capability] }}</span>
-                }
-              </div>
-            </article>
-          </li>
+            <span class="workflow-step-list__order">{{ step.order }}</span>
+            <span class="workflow-step-list__copy">
+              <strong>{{ step.title }}</strong>
+              <small>{{ kindLabels[step.kind] }} / Line {{ step.sourceLine }}</small>
+            </span>
+          </button>
         }
-      </ol>
+      </div>
     } @else {
-      <div class="workflow-empty" [attr.data-phase]="phase">
-        <p class="workflow-empty__eyebrow">
-          @if (phase === 'recording') {
-            Listening for recorded actions
-          } @else {
-            Workflow editor standing by
-          }
-        </p>
-        <h3>
-          @if (phase === 'recording') {
-            Waiting for the recording to finish
-          } @else {
-            No recorded steps yet
-          }
-        </h3>
-        <p>
-          @if (phase === 'recording') {
-            Once Playwright closes, we will convert the script into a visual checklist you can
-            refine.
-          } @else {
-            The raw code and step cards will appear here after the first successful recording.
-          }
-        </p>
+      <div class="workflow-review__empty">
+        <span>{{ phase === 'recording' ? 'Recording' : 'No steps' }}</span>
       </div>
     }
-  </div>
+  </section>
 
-  <aside class="workflow-editor__sidebar">
-    <section class="workflow-panel workflow-panel--notes">
-      <p class="workflow-panel__eyebrow">Editor Directions</p>
-      <h3>Built for richer QA workflows</h3>
-      <p>
-        Each step is already classified so you can layer structured data, screenshots, and API
-        assertions on top without falling back to raw Playwright everywhere.
-      </p>
-      <ul class="workflow-panel__list">
-        <li>Bind input steps to multiple payload sets.</li>
-        <li>Attach screenshot checkpoints to navigation and interaction steps.</li>
-        <li>Insert API checks beside user actions instead of burying them in code.</li>
-      </ul>
-    </section>
+  <section class="workflow-review__panel">
+    <header class="workflow-review__header">
+      <div>
+        <p class="workflow-review__eyebrow">Inspector</p>
+        <h2>Step details</h2>
+      </div>
+    </header>
 
-    <section class="workflow-panel workflow-panel--script">
-      <div class="workflow-panel__header">
-        <div>
-          <p class="workflow-panel__eyebrow">Source Script</p>
-          <h3>Raw Playwright</h3>
-        </div>
-
-        @if (script) {
-          <span class="workflow-panel__meta">{{ lineCount }} lines</span>
-        }
+    @if (selectedStep; as step) {
+      <div class="workflow-detail-grid">
+        <article class="workflow-detail-card">
+          <span>Type</span>
+          <strong>{{ kindLabels[step.kind] }}</strong>
+        </article>
+        <article class="workflow-detail-card">
+          <span>Order</span>
+          <strong>{{ step.order }}</strong>
+        </article>
+        <article class="workflow-detail-card">
+          <span>Line</span>
+          <strong>{{ step.sourceLine }}</strong>
+        </article>
       </div>
 
+      <section class="workflow-detail-block">
+        <h3>{{ step.title }}</h3>
+        <p>{{ step.detail }}</p>
+      </section>
+
+      <section class="workflow-detail-block">
+        <h3>Locator</h3>
+        <p>{{ step.locator ? locatorLabel(step.locator) : 'No locator' }}</p>
+      </section>
+
+      <section class="workflow-detail-block">
+        <h3>Capabilities</h3>
+        <div class="workflow-chip-list">
+          @for (capability of step.capabilities; track capability) {
+            <span>{{ capabilityLabels[capability] }}</span>
+          }
+        </div>
+      </section>
+
+      <section class="workflow-detail-block">
+        <h3>Code</h3>
+        <pre>{{ step.code }}</pre>
+      </section>
+    } @else {
+      <div class="workflow-review__empty">
+        <span>Select a step</span>
+      </div>
+    }
+  </section>
+
+  <section class="workflow-review__panel">
+    <header class="workflow-review__header">
+      <div>
+        <p class="workflow-review__eyebrow">Script</p>
+        <h2>Generated code</h2>
+      </div>
       @if (script) {
-        <pre>{{ script }}</pre>
-      } @else {
-        <p class="workflow-panel__placeholder">
-          Record from {{ sourceUrl || 'a URL of your choice' }} and the generated Playwright code
-          will land here.
-        </p>
+        <span class="workflow-review__meta">{{ lineCount }} lines</span>
       }
-    </section>
-  </aside>
+    </header>
+
+    @if (script) {
+      <pre>{{ script }}</pre>
+    } @else {
+      <div class="workflow-review__empty">
+        <span>{{ sourceUrl || 'No script' }}</span>
+      </div>
+    }
+  </section>
 </section>
