@@ -48,9 +48,10 @@
   --radius-sm: 8px;
 
   --gradient-auth-page:
+    linear-gradient(90deg, rgba(7, 10, 16, 0.78), rgba(7, 10, 16, 0.52) 48%, rgba(7, 10, 16, 0.84)),
     linear-gradient(120deg, rgba(246, 215, 84, 0.08), transparent 28%),
     linear-gradient(300deg, rgba(53, 208, 186, 0.08), transparent 32%),
-    linear-gradient(180deg, #070a10 0%, #0b111b 52%, #080b11 100%);
+    url('/bg-main.png');
 
   --dashboard-bg-950: #07090c;
   --dashboard-bg-930: #0d1117;

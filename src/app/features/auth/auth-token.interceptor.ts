@@ -5,8 +5,11 @@ import { AUTH_TOKEN_STORAGE_KEY } from './models/auth.model';
 export const authTokenInterceptor: HttpInterceptorFn = (request, next) => {
   const isSpringApiRequest =
     request.url.startsWith(environment.apiHost) || request.url.startsWith('/api/');
+  const isAuthRequest =
+    request.url.startsWith(`${environment.apiHost}/api/auth`) ||
+    request.url.startsWith('/api/auth');
 
-  if (!isSpringApiRequest) {
+  if (!isSpringApiRequest || isAuthRequest) {
     return next(request);
   }
 

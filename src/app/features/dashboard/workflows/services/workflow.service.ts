@@ -1,8 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
-import type { CreateWorkflowResponse, WorkflowRequest } from '../models/workflow.model';
+import { environment } from '../../../../../environments/environment';
+import type {
+  CreateWorkflowResponse,
+  StartRecordingResponse,
+  WorkflowRequest,
+} from '../models/workflow.model';
 
 @Injectable({ providedIn: 'root' })
 export class WorkflowService {
@@ -12,5 +16,9 @@ export class WorkflowService {
 
   create(payload: WorkflowRequest): Observable<CreateWorkflowResponse> {
     return this.http.post<CreateWorkflowResponse>(this.base, payload);
+  }
+
+  startRecording(workflowId: string): Observable<StartRecordingResponse> {
+    return this.http.post<StartRecordingResponse>(`${this.base}/${workflowId}/versions/start`, null);
   }
 }

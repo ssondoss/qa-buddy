@@ -1,5 +1,7 @@
 .auth-page {
   background: var(--gradient-auth-page);
+  background-position: center;
+  background-size: cover;
   color: var(--auth-ink, var(--color-ink-900));
   font-family: var(--font-sans);
 }

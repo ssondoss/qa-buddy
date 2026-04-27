@@ -22,7 +22,11 @@ export interface ApiSuccessResponse<T> {
 }
 
 export interface LoginResponseData {
-  token: string;
+  accessToken: string;
+  tokenType: 'Bearer';
+  expiresAt: string;
+  userId: string;
+  email: string;
 }
 
 export interface ResendVerificationResponseData {

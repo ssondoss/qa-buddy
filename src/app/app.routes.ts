@@ -4,7 +4,7 @@ import { DashboardShellComponent } from './features/dashboard/dashboard-shell.co
 import { ExecutionsComponent } from './features/dashboard/executions.component';
 import { ReportsComponent } from './features/dashboard/reports.component';
 import { ScheduledComponent } from './features/dashboard/scheduled.component';
-import { WorkflowsComponent } from './features/workflows/workflows.component';
+import { WorkflowsComponent } from './features/dashboard/workflows/workflows.component';
 import { RegisterComponent } from './features/auth/register.component';
 
 export const routes: Routes = [

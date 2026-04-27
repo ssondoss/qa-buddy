@@ -42,7 +42,7 @@ export class LoginComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.data.token);
+          localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.data.accessToken);
           this.isSubmitting = false;
           void this.router.navigateByUrl('/record');
         },

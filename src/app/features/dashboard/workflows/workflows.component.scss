@@ -130,7 +130,7 @@
 
 .workflows-table {
   width: 100%;
-  min-width: 48rem;
+  min-width: 36rem;
   border-collapse: collapse;
 }
 
@@ -194,6 +194,7 @@
 .workflow-info dd {
   margin-top: 0.4rem;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .workflow-info__wide {
