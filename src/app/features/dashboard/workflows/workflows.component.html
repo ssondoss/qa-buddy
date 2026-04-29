@@ -12,6 +12,9 @@
     >
       New Workflow
     </button>
+    <button class="workflows-button" type="button" (click)="loadWorkflows()" [disabled]="isLoadingWorkflows">
+      {{ isLoadingWorkflows ? 'Refreshing...' : 'Refresh' }}
+    </button>
   </header>
 
   @if (showWorkflowForm) {
@@ -100,14 +103,15 @@
         <span class="workflows-panel__meta">{{ workflows.length }} saved</span>
       </header>
 
-      @if (workflows.length) {
+      @if (isLoadingWorkflows) {
+        <div class="workflows-empty">Loading workflows...</div>
+      } @else if (workflows.length) {
         <div class="workflows-table-wrap">
           <table class="workflows-table">
             <thead>
               <tr>
                 <th>Name</th>
                 <th>Version</th>
-                <th>Steps</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -122,7 +126,6 @@
                     <small>{{ workflow.description }}</small>
                   </td>
                   <td>v{{ workflow.versionNumber }}</td>
-                  <td>{{ workflow.stepCount }}</td>
                   <td>
                     <span class="workflows-pill" [attr.data-status]="statusToken(workflow.versionStatus)">
                       {{ statusLabel(workflow.versionStatus) }}
@@ -151,7 +154,7 @@
           </span>
         </header>
 
-        <div class="workflows-capture">
+        <form class="workflows-capture" [formGroup]="recordingForm" (ngSubmit)="startRecording()" novalidate>
           <label class="workflows-field">
             <span>Workflow</span>
             <select
@@ -165,15 +168,52 @@
             </select>
           </label>
 
+          <label class="workflows-field">
+            <span>Environment</span>
+            <select
+              formControlName="environmentId"
+              [disabled]="phase !== 'idle' || isLoadingEnvironments"
+              [class.workflows-field__control--invalid]="isRecordingFieldInvalid('environmentId')"
+            >
+              <option value="">Select environment</option>
+              @for (environment of recordingEnvironments; track environment.id) {
+                <option [value]="environment.id">{{ environment.name }}</option>
+              }
+            </select>
+            @if (isRecordingFieldInvalid('environmentId')) {
+              <small class="workflows-field__error">Environment is required.</small>
+            }
+          </label>
+
+          <label class="workflows-field">
+            <span>Start Path</span>
+            <input
+              type="text"
+              formControlName="startPath"
+              placeholder="/login"
+              maxlength="1000"
+              [disabled]="phase !== 'idle'"
+              [class.workflows-field__control--invalid]="isRecordingFieldInvalid('startPath')"
+            />
+            @if (isRecordingFieldInvalid('startPath')) {
+              <small class="workflows-field__error">
+                @if (recordingForm.controls.startPath.hasError('maxlength')) {
+                  Use 1000 characters or fewer.
+                } @else {
+                  Use a relative path, not a full URL.
+                }
+              </small>
+            }
+          </label>
+
           <button
             class="workflows-button workflows-button--primary"
-            type="button"
-            (click)="startRecording()"
-            [disabled]="phase !== 'idle' || !selectedWorkflow"
+            type="submit"
+            [disabled]="phase !== 'idle' || !selectedWorkflow || recordingForm.invalid"
           >
             {{ phase === 'recording' ? 'Recording...' : 'Start Recording' }}
           </button>
-        </div>
+        </form>
       </section>
 
       <section class="workflows-panel workflows-panel--details">
@@ -200,7 +240,7 @@
             </div>
             <div>
               <dt>Version ID</dt>
-              <dd>{{ workflow.versionId }}</dd>
+              <dd>{{ workflow.versionId || 'Not loaded' }}</dd>
             </div>
             <div>
               <dt>Version</dt>
@@ -208,7 +248,11 @@
             </div>
             <div>
               <dt>Steps</dt>
-              <dd>{{ workflow.stepCount }}</dd>
+              <dd>{{ workflow.stepCount ?? 'Not loaded' }}</dd>
+            </div>
+            <div>
+              <dt>Updated</dt>
+              <dd>{{ workflow.updatedAt || 'Not loaded' }}</dd>
             </div>
           </dl>
         } @else {

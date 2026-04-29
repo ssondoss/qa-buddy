@@ -387,3 +387,22 @@ Stylesheet update sent to client(s).
 Application bundle generation complete. [0.404 seconds] - 2026-04-26T22:39:35.832Z
 
 Page reload sent to client(s).
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+Application bundle generation failed. [0.277 seconds] - 2026-04-26T22:45:12.974Z
+
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+Application bundle generation failed. [0.128 seconds] - 2026-04-26T22:45:56.536Z
+
+[33m>[39m Changes detected. Rebuilding...
+[32m√[39m Changes detected. Rebuilding...
+[1mInitial chunk files[22m[2m | [22m[1mNames[22m        [2m | [22m [1mRaw size[22m
+[32mstyles.css[39m         [2m | [22m[2mstyles[22m       [2m | [22m[36m288.90 kB[39m[2m | [22m
+[32mmain.js[39m            [2m | [22m[2mmain[22m         [2m | [22m[36m196.97 kB[39m[2m | [22m
+
+[1m [22m                  [2m | [22m[1mInitial total[22m[2m | [22m[1m485.87 kB[22m
+
+Application bundle generation complete. [0.205 seconds] - 2026-04-26T22:46:25.190Z
+
+Page reload sent to client(s).

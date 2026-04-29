@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { LoginComponent } from './features/auth/login.component';
 import { DashboardShellComponent } from './features/dashboard/dashboard-shell.component';
+import { EnvironmentsComponent } from './features/dashboard/environments/environments.component';
 import { ExecutionsComponent } from './features/dashboard/executions.component';
 import { ReportsComponent } from './features/dashboard/reports.component';
 import { ScheduledComponent } from './features/dashboard/scheduled.component';
@@ -15,6 +16,7 @@ export const routes: Routes = [
     component: DashboardShellComponent,
     children: [
       { path: 'workflows', component: WorkflowsComponent },
+      { path: 'environments', component: EnvironmentsComponent },
       { path: 'executions', component: ExecutionsComponent },
       { path: 'scheduled', component: ScheduledComponent },
       { path: 'reports', component: ReportsComponent },

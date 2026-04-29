@@ -1,0 +1,196 @@
+<section class="env-page">
+  <header class="env-toolbar">
+    <div>
+      <p class="env-eyebrow">Configuration</p>
+      <h1>Environments</h1>
+    </div>
+
+    <div class="env-actions">
+      <button class="env-button env-button--primary" type="button" (click)="openCreateForm()">
+        New Environment
+      </button>
+      <button class="env-button" type="button" (click)="loadEnvironments()" [disabled]="isLoading">
+        {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+  </header>
+
+  @if (showForm) {
+    <section class="env-panel">
+      <header class="env-panel__header">
+        <div>
+          <p class="env-eyebrow">{{ editingEnvironmentId ? 'Edit' : 'Create' }}</p>
+          <h2>{{ editingEnvironmentId ? 'Edit environment' : 'Create environment' }}</h2>
+        </div>
+      </header>
+
+      <form class="env-form" [formGroup]="form" (ngSubmit)="saveEnvironment()" novalidate>
+        <label class="env-field">
+          <span>Name</span>
+          <input
+            type="text"
+            formControlName="name"
+            placeholder="Staging"
+            maxlength="160"
+            [class.env-field__control--invalid]="isFieldInvalid('name')"
+          />
+          @if (isFieldInvalid('name')) {
+            <small class="env-field__error">
+              @if (form.controls.name.hasError('required')) {
+                Name is required.
+              } @else {
+                Use 160 characters or fewer.
+              }
+            </small>
+          }
+        </label>
+
+        <label class="env-field">
+          <span>Web Base URL</span>
+          <input
+            type="url"
+            formControlName="webBaseUrl"
+            placeholder="https://app.example.com"
+            [class.env-field__control--invalid]="isFieldInvalid('webBaseUrl')"
+          />
+          @if (isFieldInvalid('webBaseUrl')) {
+            <small class="env-field__error">Enter an absolute HTTP or HTTPS URL.</small>
+          }
+        </label>
+
+        <label class="env-field">
+          <span>API Base URL</span>
+          <input
+            type="url"
+            formControlName="apiBaseUrl"
+            placeholder="https://api.example.com"
+            [class.env-field__control--invalid]="isFieldInvalid('apiBaseUrl')"
+          />
+          @if (isFieldInvalid('apiBaseUrl')) {
+            <small class="env-field__error">Enter an absolute HTTP or HTTPS URL.</small>
+          }
+        </label>
+
+        <div class="env-form__actions">
+          <button class="env-button env-button--primary" type="submit" [disabled]="isSaving">
+            {{ isSaving ? 'Saving...' : 'Save Environment' }}
+          </button>
+          <button class="env-button" type="button" (click)="closeForm()" [disabled]="isSaving">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  @if (error) {
+    <p class="env-banner env-banner--error">{{ error }}</p>
+  }
+
+  @if (success) {
+    <p class="env-banner env-banner--success">{{ success }}</p>
+  }
+
+  <section class="env-summary" aria-label="Environment metrics">
+    @for (metric of metrics; track metric.label) {
+      <article class="env-panel env-metric">
+        <span>{{ metric.label }}</span>
+        <strong>{{ metric.value }}</strong>
+      </article>
+    }
+  </section>
+
+  <section class="env-layout">
+    <section class="env-panel">
+      <header class="env-panel__header">
+        <div>
+          <p class="env-eyebrow">Active</p>
+          <h2>Environment list</h2>
+        </div>
+        <span class="env-panel__meta">{{ environments.length }} saved</span>
+      </header>
+
+      @if (isLoading) {
+        <div class="env-empty">Loading environments...</div>
+      } @else if (environments.length) {
+        <div class="env-table-wrap">
+          <table class="env-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Web Base URL</th>
+                <th>API Base URL</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (environment of environments; track environment.id) {
+                <tr
+                  [class.env-table__row--active]="environment.id === selectedEnvironmentId"
+                  (click)="selectEnvironment(environment.id)"
+                >
+                  <td><strong>{{ environment.name }}</strong></td>
+                  <td>{{ environment.webBaseUrl }}</td>
+                  <td>{{ environment.apiBaseUrl }}</td>
+                  <td>{{ formatDate(environment.updatedAt) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="env-empty">Create an environment to use in workflows.</div>
+      }
+    </section>
+
+    <aside class="env-panel env-details">
+      @if (selectedEnvironment; as environment) {
+        <header class="env-panel__header">
+          <div>
+            <p class="env-eyebrow">Selected</p>
+            <h2>{{ environment.name }}</h2>
+          </div>
+        </header>
+
+        <dl class="env-info">
+          <div>
+            <dt>ID</dt>
+            <dd>{{ environment.id }}</dd>
+          </div>
+          <div>
+            <dt>Web Base URL</dt>
+            <dd>{{ environment.webBaseUrl }}</dd>
+          </div>
+          <div>
+            <dt>API Base URL</dt>
+            <dd>{{ environment.apiBaseUrl }}</dd>
+          </div>
+          <div>
+            <dt>Created</dt>
+            <dd>{{ formatDate(environment.createdAt) }}</dd>
+          </div>
+          <div>
+            <dt>Updated</dt>
+            <dd>{{ formatDate(environment.updatedAt) }}</dd>
+          </div>
+        </dl>
+
+        <div class="env-details__actions">
+          <button class="env-button env-button--primary" type="button" (click)="openEditForm(environment)">
+            Edit
+          </button>
+          <button
+            class="env-button env-button--danger"
+            type="button"
+            (click)="deleteEnvironment(environment)"
+            [disabled]="deletingEnvironmentId === environment.id"
+          >
+            {{ deletingEnvironmentId === environment.id ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      } @else {
+        <div class="env-empty">Select an environment.</div>
+      }
+    </aside>
+  </section>
+</section>

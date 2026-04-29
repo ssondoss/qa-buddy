@@ -5,6 +5,11 @@ export interface WorkflowRequest {
   description?: string;
 }
 
+export interface WorkflowRecordingStartRequest {
+  environmentId: string;
+  startPath?: string;
+}
+
 export interface WorkflowResponse {
   workflowId: string;
   workflowVersionId: string;
@@ -13,6 +18,18 @@ export interface WorkflowResponse {
   versionStatus: string;
 }
 
+export interface WorkflowListItemResponse {
+  workflowId: string;
+  name: string;
+  description: string | null;
+  currentVersionStatus: string;
+  currentVersion: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type CreateWorkflowResponse = ApiSuccessResponse<WorkflowResponse>;
+
+export type WorkflowListResponse = ApiSuccessResponse<WorkflowListItemResponse[]>;
 
 export type StartRecordingResponse = ApiSuccessResponse<WorkflowResponse>;

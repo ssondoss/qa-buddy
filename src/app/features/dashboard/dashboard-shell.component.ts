@@ -16,6 +16,7 @@ interface DashboardNavItem {
 export class DashboardShellComponent {
   protected readonly navItems: readonly DashboardNavItem[] = [
     { label: 'Workflows', route: '/dashboard/workflows' },
+    { label: 'Environments', route: '/dashboard/environments' },
     { label: 'Executions', route: '/dashboard/executions' },
     { label: 'Scheduled', route: '/dashboard/scheduled' },
     { label: 'Reports', route: '/dashboard/reports' },

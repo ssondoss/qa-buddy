@@ -1,22 +1,38 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormsModule,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import type { ApiErrorResponse } from '../../auth/models/auth.model';
+import type { EnvironmentResponse } from '../environments/models/environment.model';
+import { EnvironmentService } from '../environments/services/environment.service';
 import { WorkflowEditorComponent } from './record/components/workflow-editor/workflow-editor.component';
 import type { RecordingPhase } from './record/models/record-contract.model';
 import { RecordWorkflowParserService } from './record/services/record-workflow-parser.service';
-import type { WorkflowRequest, WorkflowResponse } from './models/workflow.model';
+import type {
+  WorkflowListItemResponse,
+  WorkflowRecordingStartRequest,
+  WorkflowRequest,
+  WorkflowResponse,
+} from './models/workflow.model';
 import { WorkflowService } from './services/workflow.service';
 
 interface WorkflowListItem {
   readonly id: string;
-  readonly versionId: string;
+  readonly versionId: string | null;
   readonly versionNumber: number;
   readonly name: string;
   readonly description: string;
   readonly versionStatus: string;
-  readonly stepCount: number;
+  readonly stepCount: number | null;
+  readonly createdAt: string | null;
+  readonly updatedAt: string | null;
 }
 
 @Component({
@@ -26,7 +42,7 @@ interface WorkflowListItem {
   templateUrl: './workflows.component.html',
   styleUrl: './workflows.component.scss',
 })
-export class WorkflowsComponent {
+export class WorkflowsComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly formBuilder = inject(FormBuilder);
 
@@ -37,14 +53,26 @@ export class WorkflowsComponent {
   workflowSuccess: string | null = null;
   showWorkflowForm = false;
   isCreatingWorkflow = false;
+  isLoadingEnvironments = false;
+  isLoadingWorkflows = false;
   selectedWorkflowId = '';
 
   protected workflows: WorkflowListItem[] = [];
+  protected recordingEnvironments: EnvironmentResponse[] = [];
 
   protected readonly workflowForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(160)]],
     description: ['', [Validators.maxLength(2000)]],
   });
+  protected readonly recordingForm = this.formBuilder.nonNullable.group({
+    environmentId: ['', [Validators.required]],
+    startPath: ['', [Validators.maxLength(1000), this.relativePathValidator]],
+  });
+
+  ngOnInit(): void {
+    this.loadWorkflows();
+    this.loadRecordingEnvironments();
+  }
 
   get workflowSteps() {
     return this.workflowParser.parse(this.generatedScript);
@@ -58,21 +86,84 @@ export class WorkflowsComponent {
     const recording = this.workflows.filter((workflow) =>
       this.isRecordingStatus(workflow.versionStatus),
     ).length;
-    const versions = this.workflows.filter((workflow) => workflow.versionId).length;
-    const steps = this.workflows.reduce((total, workflow) => total + workflow.stepCount, 0);
+    const versions = this.workflows.reduce((total, workflow) => total + workflow.versionNumber, 0);
+    const selected = this.selectedWorkflow ? 1 : 0;
 
     return [
       { label: 'Workflows', value: this.workflows.length.toString() },
       { label: 'Recording', value: recording.toString() },
       { label: 'Versions', value: versions.toString() },
-      { label: 'Steps', value: steps.toString() },
+      { label: 'Selected', value: selected.toString() },
     ];
   }
 
   constructor(
+    private readonly environmentService: EnvironmentService,
     private readonly workflowParser: RecordWorkflowParserService,
     private readonly workflowService: WorkflowService,
   ) {}
+
+  protected loadWorkflows(): void {
+    this.isLoadingWorkflows = true;
+
+    this.workflowService
+      .list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.workflows = response.data.map((workflow) => this.toWorkflowListItemFromList(workflow));
+
+          if (!this.selectedWorkflowId && this.workflows.length) {
+            this.selectedWorkflowId = this.workflows[0].id;
+          }
+
+          if (
+            this.selectedWorkflowId &&
+            !this.workflows.some((workflow) => workflow.id === this.selectedWorkflowId)
+          ) {
+            this.selectedWorkflowId = this.workflows[0]?.id ?? '';
+          }
+
+          this.isLoadingWorkflows = false;
+        },
+        error: (err: HttpErrorResponse) => {
+          this.error = this.messageFromError(err, 'Failed to load workflows');
+          this.isLoadingWorkflows = false;
+        },
+      });
+  }
+
+  protected loadRecordingEnvironments(): void {
+    this.isLoadingEnvironments = true;
+
+    this.environmentService
+      .list()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          this.recordingEnvironments = response.data;
+
+          if (!this.recordingForm.controls.environmentId.value && response.data.length) {
+            this.recordingForm.controls.environmentId.setValue(response.data[0].id);
+          }
+
+          if (
+            this.recordingForm.controls.environmentId.value &&
+            !response.data.some(
+              (environment) => environment.id === this.recordingForm.controls.environmentId.value,
+            )
+          ) {
+            this.recordingForm.controls.environmentId.setValue(response.data[0]?.id ?? '');
+          }
+
+          this.isLoadingEnvironments = false;
+        },
+        error: (err: HttpErrorResponse) => {
+          this.error = this.messageFromError(err, 'Failed to load environments');
+          this.isLoadingEnvironments = false;
+        },
+      });
+  }
 
   protected selectWorkflow(workflowId: string): void {
     this.selectedWorkflowId = workflowId;
@@ -133,11 +224,21 @@ export class WorkflowsComponent {
     return control.invalid && (control.touched || control.dirty);
   }
 
+  protected isRecordingFieldInvalid(fieldName: 'environmentId' | 'startPath'): boolean {
+    const control = this.recordingForm.controls[fieldName];
+    return control.invalid && (control.touched || control.dirty);
+  }
+
   protected startRecording(): void {
     const selectedWorkflow = this.selectedWorkflow;
 
     if (!selectedWorkflow) {
       this.error = 'Create or select a workflow before recording.';
+      return;
+    }
+
+    if (this.recordingForm.invalid) {
+      this.recordingForm.markAllAsTouched();
       return;
     }
 
@@ -147,7 +248,7 @@ export class WorkflowsComponent {
     this.phase = 'recording';
 
     this.workflowService
-      .startRecording(selectedWorkflow.id)
+      .startRecording(selectedWorkflow.id, this.recordingPayload())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
@@ -172,6 +273,15 @@ export class WorkflowsComponent {
 
   protected statusToken(status: string): string {
     return status.toLowerCase().replace(/_/g, '-');
+  }
+
+  private recordingPayload(): WorkflowRecordingStartRequest {
+    const value = this.recordingForm.getRawValue();
+    const startPath = value.startPath.trim();
+
+    return startPath
+      ? { environmentId: value.environmentId, startPath }
+      : { environmentId: value.environmentId };
   }
 
   private upsertWorkflow(
@@ -201,11 +311,41 @@ export class WorkflowsComponent {
       description: metadata?.description ?? existingWorkflow?.description ?? 'No description',
       versionStatus: response.versionStatus,
       stepCount: response.stepCount,
+      createdAt: existingWorkflow?.createdAt ?? null,
+      updatedAt: existingWorkflow?.updatedAt ?? null,
+    };
+  }
+
+  private toWorkflowListItemFromList(response: WorkflowListItemResponse): WorkflowListItem {
+    return {
+      id: response.workflowId,
+      versionId: null,
+      versionNumber: response.currentVersion,
+      name: response.name,
+      description: response.description?.trim() || 'No description',
+      versionStatus: response.currentVersionStatus,
+      stepCount: null,
+      createdAt: response.createdAt,
+      updatedAt: response.updatedAt,
     };
   }
 
   private isRecordingStatus(status: string): boolean {
     return status.toLowerCase() === 'recording';
+  }
+
+  private relativePathValidator(control: AbstractControl<string>): ValidationErrors | null {
+    const value = control.value?.trim();
+
+    if (!value) {
+      return null;
+    }
+
+    if (value.startsWith('//') || /^[a-z][a-z\d+.-]*:/i.test(value)) {
+      return { relativePath: true };
+    }
+
+    return null;
   }
 
   private messageFromError(error: unknown, fallback: string): string {
