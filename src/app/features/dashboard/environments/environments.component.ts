@@ -1,4 +1,3 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
@@ -8,7 +7,6 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import type { ApiErrorResponse } from '../../auth/models/auth.model';
 import type { EnvironmentRequest, EnvironmentResponse } from './models/environment.model';
 import { EnvironmentService } from './services/environment.service';
 
@@ -20,21 +18,21 @@ import { EnvironmentService } from './services/environment.service';
   styleUrl: './environments.component.scss',
 })
 export class EnvironmentsComponent implements OnInit {
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly formBuilder = inject(FormBuilder);
-  private readonly environmentService = inject(EnvironmentService);
+  readonly destroyRef = inject(DestroyRef);
+  readonly formBuilder = inject(FormBuilder);
+  readonly environmentService = inject(EnvironmentService);
 
-  protected environments: EnvironmentResponse[] = [];
-  protected selectedEnvironmentId = '';
-  protected editingEnvironmentId: string | null = null;
-  protected isLoading = false;
-  protected isSaving = false;
-  protected deletingEnvironmentId: string | null = null;
-  protected showForm = false;
-  protected error: string | null = null;
-  protected success: string | null = null;
+  environments: EnvironmentResponse[] = [];
+  selectedEnvironmentId = '';
+  editingEnvironmentId: string | null = null;
+  isLoading = false;
+  isSaving = false;
+  deletingEnvironmentId: string | null = null;
+  showForm = false;
+  error: string | null = null;
+  success: string | null = null;
 
-  protected readonly form = this.formBuilder.nonNullable.group({
+  readonly form = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(160)]],
     webBaseUrl: ['', [Validators.required, this.absoluteHttpUrlValidator]],
     apiBaseUrl: ['', [Validators.required, this.absoluteHttpUrlValidator]],
@@ -44,13 +42,13 @@ export class EnvironmentsComponent implements OnInit {
     this.loadEnvironments();
   }
 
-  protected get selectedEnvironment(): EnvironmentResponse | null {
+  get selectedEnvironment(): EnvironmentResponse | null {
     return (
       this.environments.find((environment) => environment.id === this.selectedEnvironmentId) ?? null
     );
   }
 
-  protected get metrics() {
+  get metrics() {
     return [
       { label: 'Environments', value: this.environments.length.toString() },
       { label: 'Web URLs', value: this.environments.filter((item) => item.webBaseUrl).length.toString() },
@@ -59,7 +57,7 @@ export class EnvironmentsComponent implements OnInit {
     ];
   }
 
-  protected loadEnvironments(): void {
+  loadEnvironments(): void {
     this.error = null;
     this.isLoading = true;
 
@@ -68,7 +66,7 @@ export class EnvironmentsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.environments = response.data;
+          this.environments = response;
 
           if (!this.selectedEnvironmentId && this.environments.length) {
             this.selectedEnvironmentId = this.environments[0].id;
@@ -83,14 +81,14 @@ export class EnvironmentsComponent implements OnInit {
 
           this.isLoading = false;
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: Error) => {
           this.error = this.messageFromError(error, 'Failed to load environments');
           this.isLoading = false;
         },
       });
   }
 
-  protected selectEnvironment(environmentId: string): void {
+  selectEnvironment(environmentId: string): void {
     this.selectedEnvironmentId = environmentId;
     this.error = null;
 
@@ -98,14 +96,14 @@ export class EnvironmentsComponent implements OnInit {
       .get(environmentId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => this.upsertEnvironment(response.data),
-        error: (error: HttpErrorResponse) => {
+        next: (response) => this.upsertEnvironment(response),
+        error: (error: Error) => {
           this.error = this.messageFromError(error, 'Failed to fetch environment');
         },
       });
   }
 
-  protected openCreateForm(): void {
+  openCreateForm(): void {
     this.showForm = true;
     this.editingEnvironmentId = null;
     this.error = null;
@@ -113,7 +111,7 @@ export class EnvironmentsComponent implements OnInit {
     this.form.reset({ name: '', webBaseUrl: '', apiBaseUrl: '' });
   }
 
-  protected openEditForm(environment: EnvironmentResponse): void {
+  openEditForm(environment: EnvironmentResponse): void {
     this.showForm = true;
     this.editingEnvironmentId = environment.id;
     this.error = null;
@@ -125,13 +123,13 @@ export class EnvironmentsComponent implements OnInit {
     });
   }
 
-  protected closeForm(): void {
+  closeForm(): void {
     this.showForm = false;
     this.editingEnvironmentId = null;
     this.form.reset({ name: '', webBaseUrl: '', apiBaseUrl: '' });
   }
 
-  protected saveEnvironment(): void {
+  saveEnvironment(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -148,20 +146,20 @@ export class EnvironmentsComponent implements OnInit {
 
     request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
-        this.upsertEnvironment(response.data);
-        this.selectedEnvironmentId = response.data.id;
-        this.success = response.message;
+        this.upsertEnvironment(response);
+        this.selectedEnvironmentId = response.id;
+        this.success = this.editingEnvironmentId ? 'Environment updated' : 'Environment created';
         this.isSaving = false;
         this.closeForm();
       },
-      error: (error: HttpErrorResponse) => {
+      error: (error: Error) => {
         this.error = this.messageFromError(error, 'Failed to save environment');
         this.isSaving = false;
       },
     });
   }
 
-  protected deleteEnvironment(environment: EnvironmentResponse): void {
+  deleteEnvironment(environment: EnvironmentResponse): void {
     const confirmed = window.confirm(`Delete environment "${environment.name}"?`);
 
     if (!confirmed) {
@@ -182,22 +180,22 @@ export class EnvironmentsComponent implements OnInit {
             this.selectedEnvironmentId === environment.id
               ? (this.environments[0]?.id ?? '')
               : this.selectedEnvironmentId;
-          this.success = response.message;
+          this.success = 'Environment deleted';
           this.deletingEnvironmentId = null;
         },
-        error: (error: HttpErrorResponse) => {
+        error: (error: Error) => {
           this.error = this.messageFromError(error, 'Failed to delete environment');
           this.deletingEnvironmentId = null;
         },
       });
   }
 
-  protected isFieldInvalid(fieldName: 'name' | 'webBaseUrl' | 'apiBaseUrl'): boolean {
+  isFieldInvalid(fieldName: 'name' | 'webBaseUrl' | 'apiBaseUrl'): boolean {
     const control = this.form.controls[fieldName];
     return control.invalid && (control.touched || control.dirty);
   }
 
-  protected formatDate(value: string): string {
+  formatDate(value: string): string {
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
@@ -210,13 +208,13 @@ export class EnvironmentsComponent implements OnInit {
     }).format(date);
   }
 
-  private upsertEnvironment(environment: EnvironmentResponse): void {
+  upsertEnvironment(environment: EnvironmentResponse): void {
     this.environments = this.environments.some((item) => item.id === environment.id)
       ? this.environments.map((item) => (item.id === environment.id ? environment : item))
       : [environment, ...this.environments];
   }
 
-  private normalizedPayload(): EnvironmentRequest {
+  normalizedPayload(): EnvironmentRequest {
     const value = this.form.getRawValue();
 
     return {
@@ -226,7 +224,7 @@ export class EnvironmentsComponent implements OnInit {
     };
   }
 
-  private absoluteHttpUrlValidator(control: AbstractControl<string>): ValidationErrors | null {
+  absoluteHttpUrlValidator(control: AbstractControl<string>): ValidationErrors | null {
     const value = control.value?.trim();
 
     if (!value) {
@@ -241,13 +239,8 @@ export class EnvironmentsComponent implements OnInit {
     }
   }
 
-  private messageFromError(error: HttpErrorResponse, fallback: string): string {
-    const payload = error.error as Partial<ApiErrorResponse> | string | null;
-
-    if (typeof payload === 'string') {
-      return payload;
-    }
-
-    return payload?.message ?? fallback;
+  messageFromError(error: Error, fallback: string): string {
+    return error.message || fallback;
   }
 }
+

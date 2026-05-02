@@ -1,11 +1,10 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PortfolioFooterComponent } from '../../shared/components/portfolio-footer/portfolio-footer.component';
 import { AuthService } from './auth.service';
-import { ApiErrorResponse, AUTH_TOKEN_STORAGE_KEY } from './models/auth.model';
+import { AUTH_TOKEN_STORAGE_KEY } from './models/auth.model';
 
 @Component({
   selector: 'app-login',
@@ -15,10 +14,10 @@ import { ApiErrorResponse, AUTH_TOKEN_STORAGE_KEY } from './models/auth.model';
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly formBuilder = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
-  private readonly router = inject(Router);
+  readonly destroyRef = inject(DestroyRef);
+  readonly formBuilder = inject(FormBuilder);
+  readonly authService = inject(AuthService);
+  readonly router = inject(Router);
 
   isSubmitting = false;
   error: string | null = null;
@@ -42,13 +41,12 @@ export class LoginComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.data.accessToken);
+          localStorage.setItem(AUTH_TOKEN_STORAGE_KEY, response.accessToken);
           this.isSubmitting = false;
           void this.router.navigateByUrl('/record');
         },
-        error: (error: HttpErrorResponse) => {
-          const payload = error.error as ApiErrorResponse;
-          this.error = payload.message;
+        error: (error: Error) => {
+          this.error = error.message;
           this.isSubmitting = false;
         },
       });
@@ -59,3 +57,4 @@ export class LoginComponent {
     return control.invalid && (control.touched || control.dirty);
   }
 }
+

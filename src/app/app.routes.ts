@@ -5,6 +5,7 @@ import { EnvironmentsComponent } from './features/dashboard/environments/environ
 import { ExecutionsComponent } from './features/dashboard/executions.component';
 import { ReportsComponent } from './features/dashboard/reports.component';
 import { ScheduledComponent } from './features/dashboard/scheduled.component';
+import { VersionsComponent } from './features/dashboard/versions/versions.component';
 import { WorkflowsComponent } from './features/dashboard/workflows/workflows.component';
 import { RegisterComponent } from './features/auth/register.component';
 
@@ -16,6 +17,7 @@ export const routes: Routes = [
     component: DashboardShellComponent,
     children: [
       { path: 'workflows', component: WorkflowsComponent },
+      { path: 'versions', component: VersionsComponent },
       { path: 'environments', component: EnvironmentsComponent },
       { path: 'executions', component: ExecutionsComponent },
       { path: 'scheduled', component: ScheduledComponent },

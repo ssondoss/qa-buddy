@@ -1,33 +1,47 @@
-<section class="workflows-page">
-  <header class="workflows-toolbar">
+<section class="workflows-page d-grid gap-3">
+  <header
+    class="workflows-toolbar d-flex align-items-center justify-content-between gap-2 flex-wrap p-3"
+  >
     <div>
       <p class="workflows-eyebrow">Workspace</p>
       <h1>Workflows</h1>
     </div>
 
-    <button
-      class="workflows-button workflows-button--primary"
-      type="button"
-      (click)="openCreateWorkflow()"
-    >
-      New Workflow
-    </button>
-    <button class="workflows-button" type="button" (click)="loadWorkflows()" [disabled]="isLoadingWorkflows">
-      {{ isLoadingWorkflows ? 'Refreshing...' : 'Refresh' }}
-    </button>
+    <div class="d-flex align-items-center gap-2 flex-wrap ms-auto">
+      <button
+        class="workflows-button workflows-button--primary"
+        type="button"
+        (click)="openCreateWorkflow()"
+      >
+        New Workflow
+      </button>
+      <button
+        class="workflows-button"
+        type="button"
+        (click)="loadWorkflows()"
+        [disabled]="isLoadingWorkflows"
+      >
+        {{ isLoadingWorkflows ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
   </header>
 
   @if (showWorkflowForm) {
-    <section class="workflows-panel workflows-panel--create">
-      <header class="workflows-panel__header">
+    <section class="workflows-panel workflows-panel--create p-3">
+      <header class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
         <div>
           <p class="workflows-eyebrow">New workflow</p>
           <h2>Create a workflow</h2>
         </div>
       </header>
 
-      <form class="workflows-create-form" [formGroup]="workflowForm" (ngSubmit)="createWorkflow()" novalidate>
-        <label class="workflows-field">
+      <form
+        class="workflows-create-form row g-3 align-items-start"
+        [formGroup]="workflowForm"
+        (ngSubmit)="createWorkflow()"
+        novalidate
+      >
+        <label class="workflows-field col-12 col-lg-4">
           <span>Name</span>
           <input
             type="text"
@@ -47,7 +61,7 @@
           }
         </label>
 
-        <label class="workflows-field">
+        <label class="workflows-field col-12 col-lg-8">
           <span>Description</span>
           <textarea
             formControlName="description"
@@ -60,11 +74,20 @@
           }
         </label>
 
-        <div class="workflows-create-form__actions">
-          <button class="workflows-button workflows-button--primary" type="submit" [disabled]="isCreatingWorkflow">
+        <div class="col-12 d-flex justify-content-end gap-2 flex-wrap">
+          <button
+            class="workflows-button workflows-button--primary"
+            type="submit"
+            [disabled]="isCreatingWorkflow"
+          >
             {{ isCreatingWorkflow ? 'Creating...' : 'Create Workflow' }}
           </button>
-          <button class="workflows-button" type="button" (click)="closeCreateWorkflow()" [disabled]="isCreatingWorkflow">
+          <button
+            class="workflows-button"
+            type="button"
+            (click)="closeCreateWorkflow()"
+            [disabled]="isCreatingWorkflow"
+          >
             Cancel
           </button>
         </div>
@@ -73,203 +96,273 @@
   }
 
   @if (error) {
-    <p class="workflows-error">{{ error }}</p>
-  }
-
-  @if (workflowError) {
-    <p class="workflows-error">{{ workflowError }}</p>
+    <div class="workflows-banner workflows-error p-3">
+      <span>{{ error }}</span>
+      <button type="button" aria-label="Dismiss error" (click)="dismissError()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
   }
 
   @if (workflowSuccess) {
-    <p class="workflows-success">{{ workflowSuccess }}</p>
+    <div class="workflows-banner workflows-success p-3">
+      <span>{{ workflowSuccess }}</span>
+      <button type="button" aria-label="Dismiss success" (click)="dismissWorkflowSuccess()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
   }
 
-  <section class="workflows-summary" aria-label="Workflow metrics">
+  <!-- <section class="workflows-summary" aria-label="Workflow metrics">
     @for (metric of metrics; track metric.label) {
       <article class="workflows-metric">
         <span>{{ metric.label }}</span>
         <strong>{{ metric.value }}</strong>
       </article>
     }
+  </section> -->
+
+  <section class="workflows-panel workflows-panel--capture p-3">
+    <header class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+      <div>
+        <p class="workflows-eyebrow">Recorder</p>
+        <h2>Capture</h2>
+      </div>
+
+      <span
+        class="workflows-pill"
+        [attr.data-status]="phase === 'recording' ? 'recording' : 'idle'"
+      >
+        {{ phase === 'recording' ? 'Recording' : 'Ready' }}
+      </span>
+    </header>
+
+    <form
+      class="workflows-capture row g-3 align-items-end"
+      [formGroup]="recordingForm"
+      (ngSubmit)="startRecording()"
+      novalidate
+    >
+      <label class="workflows-field col-12 col-md-6 col-xl-3">
+        <span>Workflow</span>
+        <select
+          [value]="selectedWorkflowId"
+          (change)="selectWorkflowFromEvent($event)"
+          [disabled]="phase !== 'idle'"
+        >
+          @for (workflow of workflows; track workflow.id) {
+            <option [value]="workflow.id">{{ workflow.name }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="workflows-field col-12 col-md-6 col-xl-3">
+        <span>Environment</span>
+        <select
+          formControlName="environmentId"
+          [disabled]="phase !== 'idle' || isLoadingEnvironments"
+          [class.workflows-field__control--invalid]="isRecordingFieldInvalid('environmentId')"
+        >
+          <option value="">Select environment</option>
+          @for (environment of recordingEnvironments; track environment.id) {
+            <option [value]="environment.id">{{ environment.name }}</option>
+          }
+        </select>
+        @if (isRecordingFieldInvalid('environmentId')) {
+          <small class="workflows-field__error">Environment is required.</small>
+        }
+      </label>
+
+      <label class="workflows-field col-12 col-lg-8 col-xl-4">
+        <span>Start Path</span>
+        <input
+          type="text"
+          formControlName="startPath"
+          placeholder="/login"
+          maxlength="1000"
+          [disabled]="phase !== 'idle'"
+          [class.workflows-field__control--invalid]="isRecordingFieldInvalid('startPath')"
+        />
+        @if (isRecordingFieldInvalid('startPath')) {
+          <small class="workflows-field__error">
+            @if (recordingForm.controls.startPath.hasError('maxlength')) {
+              Use 1000 characters or fewer.
+            } @else {
+              Use a relative path, not a full URL.
+            }
+          </small>
+        }
+      </label>
+
+      <div class="col-12 col-lg-4 col-xl-2 d-grid">
+        <button
+          class="workflows-button workflows-button--primary"
+          type="submit"
+          [disabled]="phase !== 'idle' || !selectedWorkflow || recordingForm.invalid"
+        >
+          {{ phase === 'recording' ? 'Recording...' : 'Start Recording' }}
+        </button>
+      </div>
+    </form>
   </section>
 
-  <section class="workflows-layout">
-    <section class="workflows-panel workflows-panel--list">
-      <header class="workflows-panel__header">
-        <div>
-          <p class="workflows-eyebrow">Library</p>
-          <h2>Workflow list</h2>
-        </div>
-        <span class="workflows-panel__meta">{{ workflows.length }} saved</span>
-      </header>
-
-      @if (isLoadingWorkflows) {
-        <div class="workflows-empty">Loading workflows...</div>
-      } @else if (workflows.length) {
-        <div class="workflows-table-wrap">
-          <table class="workflows-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Version</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (workflow of workflows; track workflow.id) {
-                <tr
-                  [class.workflows-table__row--active]="workflow.id === selectedWorkflowId"
-                  (click)="selectWorkflow(workflow.id)"
-                >
-                  <td>
-                    <strong>{{ workflow.name }}</strong>
-                    <small>{{ workflow.description }}</small>
-                  </td>
-                  <td>v{{ workflow.versionNumber }}</td>
-                  <td>
-                    <span class="workflows-pill" [attr.data-status]="statusToken(workflow.versionStatus)">
-                      {{ statusLabel(workflow.versionStatus) }}
-                    </span>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      } @else {
-        <div class="workflows-empty">Create a workflow to start recording.</div>
-      }
-    </section>
-
-    <aside class="workflows-side">
-      <section class="workflows-panel workflows-panel--capture">
-        <header class="workflows-panel__header">
+  <section class="row g-3 align-items-start">
+    <div class="col-12">
+      <section class="workflows-panel workflows-panel--list h-100 p-3">
+        <header class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
           <div>
-            <p class="workflows-eyebrow">Recorder</p>
-            <h2>Capture</h2>
+            <p class="workflows-eyebrow">Workflow list</p>
           </div>
-
-          <span class="workflows-pill" [attr.data-status]="phase === 'recording' ? 'recording' : 'idle'">
-            {{ phase === 'recording' ? 'Recording' : 'Ready' }}
-          </span>
+          <span class="workflows-panel__meta">{{ workflows.length }} saved</span>
         </header>
 
-        <form class="workflows-capture" [formGroup]="recordingForm" (ngSubmit)="startRecording()" novalidate>
-          <label class="workflows-field">
-            <span>Workflow</span>
-            <select
-              [ngModel]="selectedWorkflowId"
-              (ngModelChange)="selectWorkflow($event)"
-              [disabled]="phase !== 'idle'"
+        @if (isLoadingWorkflows) {
+          <div class="workflows-empty p-3">Loading workflows...</div>
+        } @else if (workflows.length) {
+          @if (selectedWorkflow; as workflow) {
+            <div
+              class="workflows-selected d-flex align-items-center justify-content-between gap-2 flex-wrap"
             >
-              @for (workflow of workflows; track workflow.id) {
-                <option [value]="workflow.id">{{ workflow.name }}</option>
-              }
-            </select>
-          </label>
+              <div>
+                <span>Selected workflow</span>
+                <strong>{{ workflow.name }}</strong>
+              </div>
 
-          <label class="workflows-field">
-            <span>Environment</span>
-            <select
-              formControlName="environmentId"
-              [disabled]="phase !== 'idle' || isLoadingEnvironments"
-              [class.workflows-field__control--invalid]="isRecordingFieldInvalid('environmentId')"
-            >
-              <option value="">Select environment</option>
-              @for (environment of recordingEnvironments; track environment.id) {
-                <option [value]="environment.id">{{ environment.name }}</option>
-              }
-            </select>
-            @if (isRecordingFieldInvalid('environmentId')) {
-              <small class="workflows-field__error">Environment is required.</small>
-            }
-          </label>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="workflows-selected__description">
+                  {{ workflow.description || 'No description' }}
+                </span>
+                <a
+                  class="workflows-pill workflows-version-link"
+                  data-status="active"
+                  routerLink="/dashboard/versions"
+                  [queryParams]="{ workflowId: workflow.id }"
+                >
+                  {{ versionCountLabel(workflow.versionsCount) }}
+                </a>
+                <span>{{ formatDateTime(workflow.updatedAt) }}</span>
+              </div>
+            </div>
+          }
 
-          <label class="workflows-field">
-            <span>Start Path</span>
-            <input
-              type="text"
-              formControlName="startPath"
-              placeholder="/login"
-              maxlength="1000"
-              [disabled]="phase !== 'idle'"
-              [class.workflows-field__control--invalid]="isRecordingFieldInvalid('startPath')"
-            />
-            @if (isRecordingFieldInvalid('startPath')) {
-              <small class="workflows-field__error">
-                @if (recordingForm.controls.startPath.hasError('maxlength')) {
-                  Use 1000 characters or fewer.
-                } @else {
-                  Use a relative path, not a full URL.
-                }
-              </small>
-            }
-          </label>
+          <div class="accordion workflows-table-accordion" id="workflowsTableAccordion">
+            <div class="accordion-item">
+              <h2 class="accordion-header">
+                <button
+                  class="accordion-button py-2"
+                  [class.collapsed]="!isWorkflowTableOpen"
+                  type="button"
+                  (click)="toggleWorkflowTable()"
+                  [attr.aria-expanded]="isWorkflowTableOpen"
+                  aria-controls="workflowsTable"
+                >
+                  Workflows table
+                  <span class="workflows-pill ms-2" data-status="active">{{
+                    workflows.length
+                  }}</span>
+                </button>
+              </h2>
 
-          <button
-            class="workflows-button workflows-button--primary"
-            type="submit"
-            [disabled]="phase !== 'idle' || !selectedWorkflow || recordingForm.invalid"
-          >
-            {{ phase === 'recording' ? 'Recording...' : 'Start Recording' }}
-          </button>
-        </form>
+              <div
+                id="workflowsTable"
+                class="accordion-collapse collapse"
+                [class.show]="isWorkflowTableOpen"
+              >
+                <div class="accordion-body p-0">
+                  <div class="workflows-table-wrap">
+                    <table class="table table-sm mb-0 align-middle workflows-table">
+                      <thead>
+                        <tr>
+                          <th>Workflow</th>
+                          <th>Description</th>
+                          <th class="text-center">Versions</th>
+                          <th>Updated</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (workflow of workflows; track workflow.id) {
+                          <tr
+                            class="workflows-row"
+                            [class.workflows-row--active]="workflow.id === selectedWorkflowId"
+                            (click)="selectWorkflow(workflow.id)"
+                          >
+                            <td>
+                              <strong>{{ workflow.name }}</strong>
+                            </td>
+                            <td>
+                              <span class="workflows-table__description">
+                                {{ workflow.description || 'No description' }}
+                              </span>
+                            </td>
+                            <td class="text-center">
+                              <a
+                                class="workflows-pill workflows-version-link"
+                                data-status="active"
+                                routerLink="/dashboard/versions"
+                                [queryParams]="{ workflowId: workflow.id }"
+                                (click)="$event.stopPropagation()"
+                              >
+                                {{ workflow.versionsCount }}
+                              </a>
+                            </td>
+                            <td>
+                              <span>{{ formatDateTime(workflow.updatedAt) }}</span>
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        } @else {
+          <div class="workflows-empty p-3">Create a workflow to start recording.</div>
+        }
       </section>
+    </div>
 
-      <section class="workflows-panel workflows-panel--details">
+    <div class="col-12">
+      <section class="workflows-panel workflows-panel--details p-3">
         @if (selectedWorkflow; as workflow) {
-          <header class="workflows-panel__header">
+          <header class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
             <div>
               <p class="workflows-eyebrow">Selected</p>
               <h2>{{ workflow.name }}</h2>
             </div>
-
-            <span class="workflows-pill" [attr.data-status]="statusToken(workflow.versionStatus)">
-              {{ statusLabel(workflow.versionStatus) }}
-            </span>
           </header>
 
-          <dl class="workflow-info">
-            <div class="workflow-info__wide">
-              <dt>Description</dt>
-              <dd>{{ workflow.description }}</dd>
+          <dl class="workflow-info row g-3 mb-0 mt-3">
+            <div class="col-12 col-xl-5">
+              <div class="workflow-info__tile h-100 p-3">
+                <dt>Description</dt>
+                <dd>{{ workflow.description || 'No description' }}</dd>
+              </div>
             </div>
-            <div>
-              <dt>Workflow ID</dt>
-              <dd>{{ workflow.id }}</dd>
+            <div class="col-12 col-md-6 col-xl-3">
+              <div class="workflow-info__tile h-100 p-3">
+                <dt>Workflow ID</dt>
+                <dd>{{ workflow.id }}</dd>
+              </div>
             </div>
-            <div>
-              <dt>Version ID</dt>
-              <dd>{{ workflow.versionId || 'Not loaded' }}</dd>
+            <div class="col-12 col-md-6 col-xl-2">
+              <div class="workflow-info__tile workflow-info__tile--accent h-100 p-3">
+                <dt>Versions</dt>
+                <dd>{{ versionCountLabel(workflow.versionsCount) }}</dd>
+              </div>
             </div>
-            <div>
-              <dt>Version</dt>
-              <dd>v{{ workflow.versionNumber }}</dd>
-            </div>
-            <div>
-              <dt>Steps</dt>
-              <dd>{{ workflow.stepCount ?? 'Not loaded' }}</dd>
-            </div>
-            <div>
-              <dt>Updated</dt>
-              <dd>{{ workflow.updatedAt || 'Not loaded' }}</dd>
+            <div class="col-12 col-md-6 col-xl-2">
+              <div class="workflow-info__tile h-100 p-3">
+                <dt>Updated</dt>
+                <dd>{{ formatDateTime(workflow.updatedAt) }}</dd>
+              </div>
             </div>
           </dl>
         } @else {
-          <div class="workflows-empty">No workflow selected.</div>
+          <div class="workflows-empty p-3">No workflow selected.</div>
         }
       </section>
-    </aside>
+    </div>
   </section>
-
-  <section class="workflows-section-heading">
-    <h2>Recorded workflow</h2>
-  </section>
-
-  <app-workflow-editor
-    [steps]="workflowSteps"
-    [script]="generatedScript"
-    [phase]="phase"
-    sourceUrl=""
-  />
 </section>

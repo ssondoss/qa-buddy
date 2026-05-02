@@ -3,12 +3,11 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type {
+  LoginResponseData,
   LoginRequest,
-  LoginResponse,
   RegisterRequest,
-  RegisterResponse,
   ResendVerificationRequest,
-  ResendVerificationResponse,
+  ResendVerificationResponseData,
 } from './models/auth.model';
 
 @Injectable({ providedIn: 'root' })
@@ -17,15 +16,15 @@ export class AuthService {
 
   constructor(private readonly http: HttpClient) {}
 
-  register(payload: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(`${this.base}/register`, payload);
+  register(payload: RegisterRequest): Observable<unknown> {
+    return this.http.post<unknown>(`${this.base}/register`, payload);
   }
 
-  login(payload: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.base}/login`, payload);
+  login(payload: LoginRequest): Observable<LoginResponseData> {
+    return this.http.post<LoginResponseData>(`${this.base}/login`, payload);
   }
 
-  resendVerification(payload: ResendVerificationRequest): Observable<ResendVerificationResponse> {
-    return this.http.post<ResendVerificationResponse>(`${this.base}/resend-verification`, payload);
+  resendVerification(payload: ResendVerificationRequest): Observable<ResendVerificationResponseData> {
+    return this.http.post<ResendVerificationResponseData>(`${this.base}/resend-verification`, payload);
   }
 }

@@ -15,14 +15,14 @@ interface ReportItem {
   styleUrl: './reports.component.scss',
 })
 export class ReportsComponent {
-  protected readonly metrics = [
+  readonly metrics = [
     { label: 'Pass Rate', value: '91%' },
     { label: 'Coverage', value: '74%' },
     { label: 'Open Failures', value: '9' },
     { label: 'Exports', value: '32' },
   ];
 
-  protected readonly reports: readonly ReportItem[] = [
+  readonly reports: readonly ReportItem[] = [
     {
       name: 'Weekly Regression',
       period: 'Apr 18 - Apr 24',
@@ -46,3 +46,4 @@ export class ReportsComponent {
     },
   ];
 }
+

@@ -1,0 +1,825 @@
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'selectWorkflowFromEvent' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:32:18:
+[37m      32 │         (change)="[32mselectWorkflowFromEvent[37m($event)"
+         ╵                   [32m~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of VersionsComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:24:33:
+[37m      24 │   imports: [ReactiveFormsModule, [32mRouterLink[37m],
+         ╵                                  [32m~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Opening tag "button" not terminated.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:114:10:
+[37m      114 │           [32m<button[37m
+          ╵           [32m~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: RouterLink is not used within the template of VersionsComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:24:33:
+[37m      24 │   imports: [ReactiveFormsModule, [32mRouterLink[37m],
+         ╵                                  [32m~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Unexpected closing block. The block may have been closed earlier. Did you forget to close the <details> element? If you meant to write the `}` character, you should use the "&#125;" HTML entity instead.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:99:14:
+[37m      99 │               [32m}[37m
+         ╵               [32m^[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mNG5002: Unexpected closing tag "details". It may happen when the tag has already been closed by another tag. For more info see https://www.w3.org/TR/html5/syntax.html#closing-elements-that-have-implied-end-tags[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:104:8:
+[37m      104 │         [32m</details>[37m
+          ╵         [32m~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepId' does not exist on type 'StepView'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:482:16:
+[37m      482 │     return step.[32mstepId[37m ?? step.id ?? null;
+          ╵                 [32m~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8102: NG8102: The left side of this nullish coalescing operation does not include 'null' or 'undefined' in its type, therefore the '??' operator can be safely removed. Find more at https://v21.angular.dev/extended-diagnostics/NG8102[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:279:23:
+[37m      279 │                 <dd>{{ [32mselectedStep.retryCount ?? '-'[37m }}</dd>
+          ╵                        [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Warning occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:198:45:
+[37m      198 │ ...or (step of steps; track [32mstepTrackKey[37m(step); let rowIndex = $i...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:97:42:
+[37m      97 │ ...steps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+         ╵                              [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:234:32:
+[37m      234 │     this.selectedStepKey = this.[32mstepTrackKey[37m(step);
+          ╵                                 [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepIdentity' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:236:30:
+[37m      236 │     this.editingStepId = this.[32mstepIdentity[37m(step);
+          ╵                               [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepIdentity' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:300:31:
+[37m      300 │     const stepId = step ? this.[32mstepIdentity[37m(step) : null;
+          ╵                                [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:358:31:
+[37m      358 │     this.draggedStepKey = this.[32mstepTrackKey[37m(step);
+          ╵                                [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:374:32:
+[37m      374 │     this.dragOverStepKey = this.[32mstepTrackKey[37m(step);
+          ╵                                 [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:382:38:
+[37m      382 │     if (this.dragOverStepKey === this.[32mstepTrackKey[37m(step)) {
+          ╵                                       [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:396:21:
+[37m      396 │       (step) => this.[32mstepTrackKey[37m(step) === this.draggedStepKey,
+          ╵                      [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:417:40:
+[37m      417 │     return this.draggedStepKey === this.[32mstepTrackKey[37m(step);
+          ╵                                         [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:421:25:
+[37m      421 │     const stepKey = this.[32mstepTrackKey[37m(step);
+          ╵                          [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepIdentity' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:435:49:
+[37m      435 │ ...const stepIds = reordered.map((item) => this.[32mstepIdentity[37m(item));
+          ╵                                                 [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:522:37:
+[37m      522 │ ...teps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:198:45:
+[37m      198 │ ...or (step of steps; track [32mstepTrackKey[37m(step); let rowIndex = $i...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:97:42:
+[37m      97 │ ...steps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+         ╵                              [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepIdentity' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:300:31:
+[37m      300 │     const stepId = step ? this.[32mstepIdentity[37m(step) : null;
+          ╵                                [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:358:31:
+[37m      358 │     this.draggedStepKey = this.[32mstepTrackKey[37m(step);
+          ╵                                [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:374:32:
+[37m      374 │     this.dragOverStepKey = this.[32mstepTrackKey[37m(step);
+          ╵                                 [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:382:38:
+[37m      382 │     if (this.dragOverStepKey === this.[32mstepTrackKey[37m(step)) {
+          ╵                                       [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:396:21:
+[37m      396 │       (step) => this.[32mstepTrackKey[37m(step) === this.draggedStepKey,
+          ╵                      [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:417:40:
+[37m      417 │     return this.draggedStepKey === this.[32mstepTrackKey[37m(step);
+          ╵                                         [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:421:25:
+[37m      421 │     const stepKey = this.[32mstepTrackKey[37m(step);
+          ╵                          [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepIdentity' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:435:49:
+[37m      435 │ ...const stepIds = reordered.map((item) => this.[32mstepIdentity[37m(item));
+          ╵                                                 [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:522:37:
+[37m      522 │ ...teps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:198:45:
+[37m      198 │ ...or (step of steps; track [32mstepTrackKey[37m(step); let rowIndex = $i...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:97:42:
+[37m      97 │ ...steps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+         ╵                              [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:358:31:
+[37m      358 │     this.draggedStepKey = this.[32mstepTrackKey[37m(step);
+          ╵                                [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:374:32:
+[37m      374 │     this.dragOverStepKey = this.[32mstepTrackKey[37m(step);
+          ╵                                 [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:382:38:
+[37m      382 │     if (this.dragOverStepKey === this.[32mstepTrackKey[37m(step)) {
+          ╵                                       [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:396:21:
+[37m      396 │       (step) => this.[32mstepTrackKey[37m(step) === this.draggedStepKey,
+          ╵                      [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:417:40:
+[37m      417 │     return this.draggedStepKey === this.[32mstepTrackKey[37m(step);
+          ╵                                         [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:421:25:
+[37m      421 │     const stepKey = this.[32mstepTrackKey[37m(step);
+          ╵                          [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepIdentity' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:435:49:
+[37m      435 │ ...const stepIds = reordered.map((item) => this.[32mstepIdentity[37m(item));
+          ╵                                                 [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:522:37:
+[37m      522 │ ...teps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:198:45:
+[37m      198 │ ...or (step of steps; track [32mstepTrackKey[37m(step); let rowIndex = $i...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:97:42:
+[37m      97 │ ...steps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+         ╵                              [32m~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:522:37:
+[37m      522 │ ...teps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:198:45:
+[37m      198 │ ...or (step of steps; track [32mstepTrackKey[37m(step); let rowIndex = $i...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:97:42:
+[37m      97 │ ...steps.find((step) => this.[32mstepTrackKey[37m(step) === this.selectedS...
+         ╵                              [32m~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'stepTrackKey' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:198:45:
+[37m      198 │ ...or (step of steps; track [32mstepTrackKey[37m(step); let rowIndex = $i...
+          ╵                             [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissError' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:11:64:
+[37m      11 │ ...type="button" aria-label="Dismiss error" (click)="[32mdismissError[37m()">
+         ╵                                                      [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissSuccess' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:20:66:
+[37m      20 │ ...="button" aria-label="Dismiss success" (click)="[32mdismissSuccess[37m()">
+         ╵                                                    [32m~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissError' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:11:64:
+[37m      11 │ ...type="button" aria-label="Dismiss error" (click)="[32mdismissError[37m()">
+         ╵                                                      [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissSuccess' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:20:66:
+[37m      20 │ ...="button" aria-label="Dismiss success" (click)="[32mdismissSuccess[37m()">
+         ╵                                                    [32m~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissError' does not exist on type 'WorkflowsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.html:97:64:
+[37m      97 │ ...type="button" aria-label="Dismiss error" (click)="[32mdismissError[37m()">
+         ╵                                                      [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component WorkflowsComponent.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./workflows.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'dismissWorkflowSuccess' does not exist on type 'WorkflowsComponent'. Did you mean 'workflowSuccess'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.html:106:66:
+[37m      106 │ ... aria-label="Dismiss success" (click)="[32mdismissWorkflowSuccess[37m()">
+          ╵                                           [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component WorkflowsComponent.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./workflows.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissError' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:11:64:
+[37m      11 │ ...type="button" aria-label="Dismiss error" (click)="[32mdismissError[37m()">
+         ╵                                                      [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissSuccess' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:20:66:
+[37m      20 │ ...="button" aria-label="Dismiss success" (click)="[32mdismissSuccess[37m()">
+         ╵                                                    [32m~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'clearNotificationTimer' does not exist on type 'VersionsComponent'. Did you mean 'notificationTimer'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:81:41:
+[37m      81 │     this.destroyRef.onDestroy(() => this.[32mclearNotificationTimer[37m());
+         ╵                                          [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  'notificationTimer' is declared here.
+
+    src/app/features/dashboard/versions/versions.component.ts:51:10:
+[37m      51 │   private [32mnotificationTimer[37m: ReturnType<typeof setTimeout> | null ...
+         ╵           [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'setSuccess' does not exist on type 'VersionsComponent'. Did you mean 'success'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:289:13:
+[37m      289 │         this.[32msetSuccess[37m(this.isCreatingStep ? 'Step created' : 'S...
+          ╵              [32m~~~~~~~~~~[0m
+
+  'success' is declared here.
+
+    src/app/features/dashboard/versions/versions.component.ts:50:2:
+[37m      50 │   [32msuccess[37m: string | null = null;
+         ╵   [32m~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'setSuccess' does not exist on type 'VersionsComponent'. Did you mean 'success'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:323:15:
+[37m      323 │           this.[32msetSuccess[37m('Step deleted');
+          ╵                [32m~~~~~~~~~~[0m
+
+  'success' is declared here.
+
+    src/app/features/dashboard/versions/versions.component.ts:50:2:
+[37m      50 │   [32msuccess[37m: string | null = null;
+         ╵   [32m~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'setSuccess' does not exist on type 'VersionsComponent'. Did you mean 'success'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:453:15:
+[37m      453 │           this.[32msetSuccess[37m('Steps reordered');
+          ╵                [32m~~~~~~~~~~[0m
+
+  'success' is declared here.
+
+    src/app/features/dashboard/versions/versions.component.ts:50:2:
+[37m      50 │   [32msuccess[37m: string | null = null;
+         ╵   [32m~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissError' does not exist on type 'WorkflowsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.html:97:64:
+[37m      97 │ ...type="button" aria-label="Dismiss error" (click)="[32mdismissError[37m()">
+         ╵                                                      [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component WorkflowsComponent.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./workflows.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'dismissWorkflowSuccess' does not exist on type 'WorkflowsComponent'. Did you mean 'workflowSuccess'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.html:106:66:
+[37m      106 │ ... aria-label="Dismiss success" (click)="[32mdismissWorkflowSuccess[37m()">
+          ╵                                           [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component WorkflowsComponent.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./workflows.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissError' does not exist on type 'WorkflowsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.html:97:64:
+[37m      97 │ ...type="button" aria-label="Dismiss error" (click)="[32mdismissError[37m()">
+         ╵                                                      [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component WorkflowsComponent.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./workflows.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'dismissWorkflowSuccess' does not exist on type 'WorkflowsComponent'. Did you mean 'workflowSuccess'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.html:106:66:
+[37m      106 │ ... aria-label="Dismiss success" (click)="[32mdismissWorkflowSuccess[37m()">
+          ╵                                           [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component WorkflowsComponent.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./workflows.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'dismissError' does not exist on type 'WorkflowsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.html:97:64:
+[37m      97 │ ...type="button" aria-label="Dismiss error" (click)="[32mdismissError[37m()">
+         ╵                                                      [32m~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component WorkflowsComponent.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./workflows.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'dismissWorkflowSuccess' does not exist on type 'WorkflowsComponent'. Did you mean 'workflowSuccess'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.html:106:66:
+[37m      106 │ ... aria-label="Dismiss success" (click)="[32mdismissWorkflowSuccess[37m()">
+          ╵                                           [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component WorkflowsComponent.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./workflows.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'clearNotificationTimer' does not exist on type 'WorkflowsComponent'. Did you mean 'notificationTimer'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.ts:58:41:
+[37m      58 │     this.destroyRef.onDestroy(() => this.[32mclearNotificationTimer[37m());
+         ╵                                          [32m~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  'notificationTimer' is declared here.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:35:10:
+[37m      35 │   private [32mnotificationTimer[37m: ReturnType<typeof setTimeout> | null ...
+         ╵           [32m~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'setWorkflowSuccess' does not exist on type 'WorkflowsComponent'. Did you mean 'workflowSuccess'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.ts:197:15:
+[37m      197 │           this.[32msetWorkflowSuccess[37m('Workflow created');
+          ╵                [32m~~~~~~~~~~~~~~~~~~[0m
+
+  'workflowSuccess' is declared here.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:34:2:
+[37m      34 │   [32mworkflowSuccess[37m: string | null = null;
+         ╵   [32m~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2551: Property 'setWorkflowSuccess' does not exist on type 'WorkflowsComponent'. Did you mean 'workflowSuccess'?[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/workflows/workflows.component.ts:245:15:
+[37m      245 │           this.[32msetWorkflowSuccess[37m('Recording started');
+          ╵                [32m~~~~~~~~~~~~~~~~~~[0m
+
+  'workflowSuccess' is declared here.
+
+    src/app/features/dashboard/workflows/workflows.component.ts:34:2:
+[37m      34 │   [32mworkflowSuccess[37m: string | null = null;
+         ╵   [32m~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2322: Type 'string' is not assignable to type 'boolean'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:332:20:
+[37m      332 │                     [32mdisabled[37m
+          ╵                     [32m~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2322: Type 'string' is not assignable to type 'boolean'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:332:20:
+[37m      332 │                     [32mdisabled[37m
+          ╵                     [32m~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2322: Type 'string' is not assignable to type 'boolean'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:332:20:
+[37m      332 │                     [32mdisabled[37m
+          ╵                     [32m~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'metaJsonStatusToken' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:393:47:
+[37m      393 │ ...l [attr.data-status]="[32mmetaJsonStatusToken[37m">{{ metaJsonStatusLa...
+          ╵                          [32m~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'metaJsonStatusLabel' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:393:71:
+[37m      393 │ ...a-status]="metaJsonStatusToken">{{ [32mmetaJsonStatusLabel[37m }}</small>
+          ╵                                       [32m~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'formatMetaJson' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:396:95:
+[37m      396 │ ...on versions-button--sm" type="button" (click)="[32mformatMetaJson[37m()">
+          ╵                                                   [32m~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'clearMetaJson' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:399:95:
+[37m      399 │ ...ton versions-button--sm" type="button" (click)="[32mclearMetaJson[37m()">
+          ╵                                                    [32m~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:25:15:
+[37m      25 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m
+[1m[33m[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1mNG8113: CodeEditor is not used within the template of VersionsComponent[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.ts:26:33:
+[37m      26 │   imports: [ReactiveFormsModule, [32mCodeEditor[37m],
+         ╵                                  [32m~~~~~~~~~~[0m
+
+[39m[22m
+[1m[31m[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'metaJsonStatusToken' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:393:47:
+[37m      393 │ ...l [attr.data-status]="[32mmetaJsonStatusToken[37m">{{ metaJsonStatusLa...
+          ╵                          [32m~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:27:15:
+[37m      27 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'metaJsonStatusLabel' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:393:71:
+[37m      393 │ ...a-status]="metaJsonStatusToken">{{ [32mmetaJsonStatusLabel[37m }}</small>
+          ╵                                       [32m~~~~~~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:27:15:
+[37m      27 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'formatMetaJson' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:396:95:
+[37m      396 │ ...on versions-button--sm" type="button" (click)="[32mformatMetaJson[37m()">
+          ╵                                                   [32m~~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:27:15:
+[37m      27 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+[31mX [41;31m[[41;97mERROR[41;31m][0m [1mTS2339: Property 'clearMetaJson' does not exist on type 'VersionsComponent'.[0m [1m[35m[plugin angular-compiler][0m
+
+    src/app/features/dashboard/versions/versions.component.html:399:95:
+[37m      399 │ ...ton versions-button--sm" type="button" (click)="[32mclearMetaJson[37m()">
+          ╵                                                    [32m~~~~~~~~~~~~~[0m
+
+  Error occurs in the template of component VersionsComponent.
+
+    src/app/features/dashboard/versions/versions.component.ts:27:15:
+[37m      27 │   templateUrl: [32m'./versions.component.html'[37m,
+         ╵                [32m~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[39m[22m

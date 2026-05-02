@@ -10,3 +10,4 @@ export class PortfolioFooterComponent {
   readonly currentYear = new Date().getFullYear();
   readonly portfolioUrl = 'https://ssondoss.github.io/me/';
 }
+

@@ -1,0 +1,18 @@
+@if (notifications().length) {
+  <section class="notification-stack" aria-label="Notifications" aria-live="polite">
+    @for (notification of notifications(); track notification.id) {
+      <article
+        class="notification"
+        role="alert"
+        [class.notification--error]="notification.kind === 'error'"
+        [class.notification--info]="notification.kind === 'info'"
+        [class.notification--success]="notification.kind === 'success'"
+      >
+        <p>{{ notification.message }}</p>
+        <button type="button" aria-label="Dismiss notification" (click)="dismiss(notification.id)">
+          x
+        </button>
+      </article>
+    }
+  </section>
+}

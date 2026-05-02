@@ -1,109 +1,74 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {
   AbstractControl,
   FormBuilder,
-  FormsModule,
   ReactiveFormsModule,
   ValidationErrors,
   Validators,
 } from '@angular/forms';
-import type { ApiErrorResponse } from '../../auth/models/auth.model';
+import { RouterLink } from '@angular/router';
 import type { EnvironmentResponse } from '../environments/models/environment.model';
 import { EnvironmentService } from '../environments/services/environment.service';
-import { WorkflowEditorComponent } from './record/components/workflow-editor/workflow-editor.component';
 import type { RecordingPhase } from './record/models/record-contract.model';
-import { RecordWorkflowParserService } from './record/services/record-workflow-parser.service';
 import type {
-  WorkflowListItemResponse,
   WorkflowRecordingStartRequest,
-  WorkflowRequest,
   WorkflowResponse,
+  WorkflowUpsertRequest,
 } from './models/workflow.model';
 import { WorkflowService } from './services/workflow.service';
-
-interface WorkflowListItem {
-  readonly id: string;
-  readonly versionId: string | null;
-  readonly versionNumber: number;
-  readonly name: string;
-  readonly description: string;
-  readonly versionStatus: string;
-  readonly stepCount: number | null;
-  readonly createdAt: string | null;
-  readonly updatedAt: string | null;
-}
 
 @Component({
   selector: 'app-workflows',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, WorkflowEditorComponent],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './workflows.component.html',
   styleUrl: './workflows.component.scss',
 })
 export class WorkflowsComponent implements OnInit {
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly formBuilder = inject(FormBuilder);
+  readonly destroyRef = inject(DestroyRef);
+  readonly formBuilder = inject(FormBuilder);
 
   phase: RecordingPhase = 'idle';
-  generatedScript: string | null = null;
   error: string | null = null;
-  workflowError: string | null = null;
   workflowSuccess: string | null = null;
+  private notificationTimer: ReturnType<typeof setTimeout> | null = null;
   showWorkflowForm = false;
   isCreatingWorkflow = false;
   isLoadingEnvironments = false;
   isLoadingWorkflows = false;
+  isWorkflowTableOpen = true;
   selectedWorkflowId = '';
 
-  protected workflows: WorkflowListItem[] = [];
-  protected recordingEnvironments: EnvironmentResponse[] = [];
+  workflows: WorkflowResponse[] = [];
+  recordingEnvironments: EnvironmentResponse[] = [];
 
-  protected readonly workflowForm = this.formBuilder.nonNullable.group({
+  readonly workflowForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(160)]],
     description: ['', [Validators.maxLength(2000)]],
   });
-  protected readonly recordingForm = this.formBuilder.nonNullable.group({
+  readonly recordingForm = this.formBuilder.nonNullable.group({
     environmentId: ['', [Validators.required]],
     startPath: ['', [Validators.maxLength(1000), this.relativePathValidator]],
   });
+
+  constructor(
+    readonly environmentService: EnvironmentService,
+    readonly workflowService: WorkflowService,
+  ) {
+    this.destroyRef.onDestroy(() => this.clearNotificationTimer());
+  }
 
   ngOnInit(): void {
     this.loadWorkflows();
     this.loadRecordingEnvironments();
   }
 
-  get workflowSteps() {
-    return this.workflowParser.parse(this.generatedScript);
-  }
-
-  protected get selectedWorkflow(): WorkflowListItem | null {
+  get selectedWorkflow(): WorkflowResponse | null {
     return this.workflows.find((workflow) => workflow.id === this.selectedWorkflowId) ?? null;
   }
 
-  protected get metrics() {
-    const recording = this.workflows.filter((workflow) =>
-      this.isRecordingStatus(workflow.versionStatus),
-    ).length;
-    const versions = this.workflows.reduce((total, workflow) => total + workflow.versionNumber, 0);
-    const selected = this.selectedWorkflow ? 1 : 0;
-
-    return [
-      { label: 'Workflows', value: this.workflows.length.toString() },
-      { label: 'Recording', value: recording.toString() },
-      { label: 'Versions', value: versions.toString() },
-      { label: 'Selected', value: selected.toString() },
-    ];
-  }
-
-  constructor(
-    private readonly environmentService: EnvironmentService,
-    private readonly workflowParser: RecordWorkflowParserService,
-    private readonly workflowService: WorkflowService,
-  ) {}
-
-  protected loadWorkflows(): void {
+  loadWorkflows(): void {
     this.isLoadingWorkflows = true;
 
     this.workflowService
@@ -111,7 +76,7 @@ export class WorkflowsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.workflows = response.data.map((workflow) => this.toWorkflowListItemFromList(workflow));
+          this.workflows = response;
 
           if (!this.selectedWorkflowId && this.workflows.length) {
             this.selectedWorkflowId = this.workflows[0].id;
@@ -126,14 +91,13 @@ export class WorkflowsComponent implements OnInit {
 
           this.isLoadingWorkflows = false;
         },
-        error: (err: HttpErrorResponse) => {
-          this.error = this.messageFromError(err, 'Failed to load workflows');
+        error: (err: Error) => {
           this.isLoadingWorkflows = false;
         },
       });
   }
 
-  protected loadRecordingEnvironments(): void {
+  loadRecordingEnvironments(): void {
     this.isLoadingEnvironments = true;
 
     this.environmentService
@@ -141,47 +105,75 @@ export class WorkflowsComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.recordingEnvironments = response.data;
+          this.recordingEnvironments = response;
 
-          if (!this.recordingForm.controls.environmentId.value && response.data.length) {
-            this.recordingForm.controls.environmentId.setValue(response.data[0].id);
+          if (!this.recordingForm.controls.environmentId.value && response.length) {
+            this.recordingForm.controls.environmentId.setValue(response[0].id);
           }
 
           if (
             this.recordingForm.controls.environmentId.value &&
-            !response.data.some(
+            !response.some(
               (environment) => environment.id === this.recordingForm.controls.environmentId.value,
             )
           ) {
-            this.recordingForm.controls.environmentId.setValue(response.data[0]?.id ?? '');
+            this.recordingForm.controls.environmentId.setValue(response[0]?.id ?? '');
           }
 
           this.isLoadingEnvironments = false;
         },
-        error: (err: HttpErrorResponse) => {
-          this.error = this.messageFromError(err, 'Failed to load environments');
+        error: (err: Error) => {
           this.isLoadingEnvironments = false;
         },
       });
   }
 
-  protected selectWorkflow(workflowId: string): void {
+  selectWorkflow(workflowId: string): void {
     this.selectedWorkflowId = workflowId;
     this.error = null;
   }
 
-  protected openCreateWorkflow(): void {
+  selectWorkflowFromEvent(event: Event): void {
+    const workflowId = (event.target as HTMLSelectElement).value;
+    this.selectWorkflow(workflowId);
+  }
+
+  toggleWorkflowTable(): void {
+    this.isWorkflowTableOpen = !this.isWorkflowTableOpen;
+  }
+
+  versionCountLabel(count: number): string {
+    return `${count} ${count === 1 ? 'version' : 'versions'}`;
+  }
+
+  formatDateTime(value: string | null | undefined): string {
+    if (!value) {
+      return 'Not loaded';
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return value;
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(date);
+  }
+
+  openCreateWorkflow(): void {
     this.showWorkflowForm = true;
-    this.workflowError = null;
     this.workflowSuccess = null;
   }
 
-  protected closeCreateWorkflow(): void {
+  closeCreateWorkflow(): void {
     this.showWorkflowForm = false;
     this.workflowForm.reset({ name: '', description: '' });
   }
 
-  protected createWorkflow(): void {
+  createWorkflow(): void {
     const rawValue = this.workflowForm.getRawValue();
     const name = rawValue.name.trim();
     const description = rawValue.description.trim();
@@ -195,9 +187,8 @@ export class WorkflowsComponent implements OnInit {
       return;
     }
 
-    const payload: WorkflowRequest = description ? { name, description } : { name };
+    const payload: WorkflowUpsertRequest = description ? { name, description } : { name };
 
-    this.workflowError = null;
     this.workflowSuccess = null;
     this.isCreatingWorkflow = true;
 
@@ -205,31 +196,31 @@ export class WorkflowsComponent implements OnInit {
       .create(payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          this.upsertWorkflow(response.data, { name, description: description || 'No description' });
-          this.workflowSuccess = response.message;
+        next: (workflow) => {
+          this.selectedWorkflowId = workflow.id;
+          this.loadWorkflows();
+          this.setWorkflowSuccess('Workflow created');
           this.isCreatingWorkflow = false;
           this.showWorkflowForm = false;
-          this.workflowForm.reset({ name: '', description: '' });
+          this.workflowForm.reset();
         },
-        error: (err: HttpErrorResponse) => {
-          this.workflowError = this.messageFromError(err, 'Failed to create workflow');
+        error: () => {
           this.isCreatingWorkflow = false;
         },
       });
   }
 
-  protected isWorkflowFieldInvalid(fieldName: 'name' | 'description'): boolean {
+  isWorkflowFieldInvalid(fieldName: 'name' | 'description'): boolean {
     const control = this.workflowForm.controls[fieldName];
     return control.invalid && (control.touched || control.dirty);
   }
 
-  protected isRecordingFieldInvalid(fieldName: 'environmentId' | 'startPath'): boolean {
+  isRecordingFieldInvalid(fieldName: 'environmentId' | 'startPath'): boolean {
     const control = this.recordingForm.controls[fieldName];
     return control.invalid && (control.touched || control.dirty);
   }
 
-  protected startRecording(): void {
+  startRecording(): void {
     const selectedWorkflow = this.selectedWorkflow;
 
     if (!selectedWorkflow) {
@@ -244,38 +235,28 @@ export class WorkflowsComponent implements OnInit {
 
     this.error = null;
     this.workflowSuccess = null;
-    this.generatedScript = null;
     this.phase = 'recording';
 
     this.workflowService
       .startRecording(selectedWorkflow.id, this.recordingPayload())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          this.upsertWorkflow(response.data);
-          this.phase = this.isRecordingStatus(response.data.versionStatus) ? 'recording' : 'idle';
-          this.workflowSuccess = response.message;
+        next: (workflow) => {
+          if (workflow?.id) {
+            this.replaceWorkflow(workflow);
+          }
+          this.loadWorkflows();
+          this.phase = 'recording';
+          this.setWorkflowSuccess('Recording started');
         },
-        error: (err: unknown) => {
+        error: (err: Error) => {
           this.phase = 'idle';
           this.error = this.messageFromError(err, 'Failed to start recording');
         },
       });
   }
 
-  protected statusLabel(status: string): string {
-    return status
-      .toLowerCase()
-      .split('_')
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  }
-
-  protected statusToken(status: string): string {
-    return status.toLowerCase().replace(/_/g, '-');
-  }
-
-  private recordingPayload(): WorkflowRecordingStartRequest {
+  recordingPayload(): WorkflowRecordingStartRequest {
     const value = this.recordingForm.getRawValue();
     const startPath = value.startPath.trim();
 
@@ -284,57 +265,41 @@ export class WorkflowsComponent implements OnInit {
       : { environmentId: value.environmentId };
   }
 
-  private upsertWorkflow(
-    response: WorkflowResponse,
-    metadata: Pick<WorkflowListItem, 'name' | 'description'> | null = null,
-  ): void {
-    const workflow = this.toWorkflowListItem(response, metadata);
-
-    this.workflows = this.workflows.some((item) => item.id === workflow.id)
-      ? this.workflows.map((item) => (item.id === workflow.id ? workflow : item))
-      : [workflow, ...this.workflows];
-
-    this.selectedWorkflowId = workflow.id;
+  replaceWorkflow(updatedWorkflow: WorkflowResponse): void {
+    this.workflows = this.workflows.map((workflow) =>
+      workflow.id === updatedWorkflow.id ? updatedWorkflow : workflow,
+    );
   }
 
-  private toWorkflowListItem(
-    response: WorkflowResponse,
-    metadata: Pick<WorkflowListItem, 'name' | 'description'> | null,
-  ): WorkflowListItem {
-    const existingWorkflow = this.workflows.find((workflow) => workflow.id === response.workflowId);
-
-    return {
-      id: response.workflowId,
-      versionId: response.workflowVersionId,
-      versionNumber: response.versionNumber,
-      name: metadata?.name ?? existingWorkflow?.name ?? 'Untitled workflow',
-      description: metadata?.description ?? existingWorkflow?.description ?? 'No description',
-      versionStatus: response.versionStatus,
-      stepCount: response.stepCount,
-      createdAt: existingWorkflow?.createdAt ?? null,
-      updatedAt: existingWorkflow?.updatedAt ?? null,
-    };
+  dismissError(): void {
+    this.error = null;
   }
 
-  private toWorkflowListItemFromList(response: WorkflowListItemResponse): WorkflowListItem {
-    return {
-      id: response.workflowId,
-      versionId: null,
-      versionNumber: response.currentVersion,
-      name: response.name,
-      description: response.description?.trim() || 'No description',
-      versionStatus: response.currentVersionStatus,
-      stepCount: null,
-      createdAt: response.createdAt,
-      updatedAt: response.updatedAt,
-    };
+  dismissWorkflowSuccess(): void {
+    this.workflowSuccess = null;
+    this.clearNotificationTimer();
   }
 
-  private isRecordingStatus(status: string): boolean {
-    return status.toLowerCase() === 'recording';
+  setWorkflowSuccess(message: string): void {
+    this.workflowSuccess = message;
+    this.error = null;
+    this.clearNotificationTimer();
+    this.notificationTimer = setTimeout(() => {
+      this.workflowSuccess = null;
+      this.notificationTimer = null;
+    }, 4000);
   }
 
-  private relativePathValidator(control: AbstractControl<string>): ValidationErrors | null {
+  clearNotificationTimer(): void {
+    if (!this.notificationTimer) {
+      return;
+    }
+
+    clearTimeout(this.notificationTimer);
+    this.notificationTimer = null;
+  }
+
+  relativePathValidator(control: AbstractControl<string>): ValidationErrors | null {
     const value = control.value?.trim();
 
     if (!value) {
@@ -348,48 +313,7 @@ export class WorkflowsComponent implements OnInit {
     return null;
   }
 
-  private messageFromError(error: unknown, fallback: string): string {
-    if (error instanceof HttpErrorResponse) {
-      return this.messageFromPayload(error.error, fallback);
-    }
-
-    return this.messageFromPayload(error, fallback);
-  }
-
-  private messageFromPayload(payload: unknown, fallback: string): string {
-    if (typeof payload === 'string') {
-      return payload;
-    }
-
-    if (!payload || typeof payload !== 'object') {
-      return fallback;
-    }
-
-    const apiPayload = payload as Partial<ApiErrorResponse> & {
-      error?: unknown;
-      message?: unknown;
-    };
-
-    if (typeof apiPayload.message === 'string') {
-      return apiPayload.message;
-    }
-
-    if (typeof apiPayload.error === 'string') {
-      return apiPayload.error;
-    }
-
-    if (apiPayload.error && typeof apiPayload.error === 'object') {
-      const nestedPayload = apiPayload.error as { message?: unknown; error?: unknown };
-
-      if (typeof nestedPayload.message === 'string') {
-        return nestedPayload.message;
-      }
-
-      if (typeof nestedPayload.error === 'string') {
-        return nestedPayload.error;
-      }
-    }
-
-    return fallback;
+  messageFromError(error: Error, fallback: string): string {
+    return error.message || fallback;
   }
 }

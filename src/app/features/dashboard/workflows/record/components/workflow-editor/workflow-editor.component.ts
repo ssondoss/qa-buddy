@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import type { RecordingPhase } from '../../models/record-contract.model';
 import type {
   WorkflowCapability,
@@ -23,10 +23,13 @@ export class WorkflowEditorComponent implements OnChanges {
   @Input() script: string | null = null;
   @Input() phase: RecordingPhase = 'idle';
   @Input() sourceUrl = '';
+  @Input() canEdit = false;
+  @Input() isSaving = false;
+  @Output() addStep = new EventEmitter<WorkflowStepKind>();
 
-  protected selectedStepId: string | null = null;
+  selectedStepId: string | null = null;
 
-  protected readonly kindLabels: Record<WorkflowStepKind, string> = {
+  readonly kindLabels: Record<WorkflowStepKind, string> = {
     navigate: 'Navigate',
     click: 'Action',
     input: 'Input',
@@ -35,13 +38,13 @@ export class WorkflowEditorComponent implements OnChanges {
     code: 'Code',
   };
 
-  protected readonly capabilityLabels: Record<WorkflowCapability, string> = {
+  readonly capabilityLabels: Record<WorkflowCapability, string> = {
     payloads: 'Payloads',
     screenshots: 'Screenshots',
     apiChecks: 'API Checks',
   };
 
-  protected readonly quickAddActions: readonly QuickAddAction[] = [
+  readonly quickAddActions: readonly QuickAddAction[] = [
     { label: 'Add Step', kind: 'click' },
     { label: 'Add Input', kind: 'input' },
     { label: 'Add Check', kind: 'assert' },
@@ -54,7 +57,7 @@ export class WorkflowEditorComponent implements OnChanges {
     }
   }
 
-  protected get selectedStep(): WorkflowStep | null {
+  get selectedStep(): WorkflowStep | null {
     if (!this.steps.length) {
       return null;
     }
@@ -62,23 +65,27 @@ export class WorkflowEditorComponent implements OnChanges {
     return this.steps.find((step) => step.id === this.selectedStepId) ?? this.steps[0] ?? null;
   }
 
-  protected get lineCount(): number {
+  get lineCount(): number {
     return this.script?.split('\n').length ?? 0;
   }
 
-  protected selectStep(stepId: string): void {
+  selectStep(stepId: string): void {
     this.selectedStepId = stepId;
   }
 
-  protected isSelected(stepId: string): boolean {
+  requestAddStep(kind: WorkflowStepKind): void {
+    this.addStep.emit(kind);
+  }
+
+  isSelected(stepId: string): boolean {
     return this.selectedStep?.id === stepId;
   }
 
-  protected locatorLabel(locator: WorkflowLocator): string {
+  locatorLabel(locator: WorkflowLocator): string {
     return `${locator.strategy} / ${locator.value}`;
   }
 
-  private syncSelection(): void {
+  syncSelection(): void {
     if (!this.steps.length) {
       this.selectedStepId = null;
       return;
@@ -89,3 +96,4 @@ export class WorkflowEditorComponent implements OnChanges {
     }
   }
 }
+

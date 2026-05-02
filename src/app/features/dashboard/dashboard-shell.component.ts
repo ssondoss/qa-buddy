@@ -14,11 +14,14 @@ interface DashboardNavItem {
   styleUrl: './dashboard-shell.component.scss',
 })
 export class DashboardShellComponent {
-  protected readonly navItems: readonly DashboardNavItem[] = [
+  readonly navItems: readonly DashboardNavItem[] = [
     { label: 'Workflows', route: '/dashboard/workflows' },
+    { label: 'Versions', route: '/dashboard/versions' },
     { label: 'Environments', route: '/dashboard/environments' },
     { label: 'Executions', route: '/dashboard/executions' },
     { label: 'Scheduled', route: '/dashboard/scheduled' },
     { label: 'Reports', route: '/dashboard/reports' },
   ];
 }
+
+

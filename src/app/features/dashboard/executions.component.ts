@@ -17,14 +17,14 @@ interface ExecutionItem {
   styleUrl: './executions.component.scss',
 })
 export class ExecutionsComponent {
-  protected readonly metrics = [
+  readonly metrics = [
     { label: 'Total', value: '128' },
     { label: 'Running', value: '6' },
     { label: 'Failed', value: '11' },
     { label: 'Avg Duration', value: '04:18' },
   ];
 
-  protected readonly executions: readonly ExecutionItem[] = [
+  readonly executions: readonly ExecutionItem[] = [
     {
       id: 'EX-1042',
       workflow: 'Checkout Smoke',
@@ -63,3 +63,4 @@ export class ExecutionsComponent {
     },
   ];
 }
+

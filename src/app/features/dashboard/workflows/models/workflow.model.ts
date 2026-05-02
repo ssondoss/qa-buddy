@@ -1,6 +1,6 @@
-import type { ApiSuccessResponse } from '../../../auth/models/auth.model';
+export type WorkflowVersionStatus = 'DRAFT' | 'RECORDING' | 'READY' | 'FAILED';
 
-export interface WorkflowRequest {
+export interface WorkflowUpsertRequest {
   name: string;
   description?: string;
 }
@@ -11,25 +11,22 @@ export interface WorkflowRecordingStartRequest {
 }
 
 export interface WorkflowResponse {
-  workflowId: string;
-  workflowVersionId: string;
-  versionNumber: number;
-  stepCount: number;
-  versionStatus: string;
-}
-
-export interface WorkflowListItemResponse {
-  workflowId: string;
+  id: string;
   name: string;
-  description: string | null;
-  currentVersionStatus: string;
-  currentVersion: number;
+  description: string;
+  versionsCount: number;
   createdAt: string;
   updatedAt: string;
 }
 
-export type CreateWorkflowResponse = ApiSuccessResponse<WorkflowResponse>;
-
-export type WorkflowListResponse = ApiSuccessResponse<WorkflowListItemResponse[]>;
-
-export type StartRecordingResponse = ApiSuccessResponse<WorkflowResponse>;
+export interface VersionView {
+  workflowId: string;
+  versionId: string;
+  versionNumber: number;
+  status: WorkflowVersionStatus;
+  environmentNameSnapshot: string | null;
+  environmentWebBaseUrlSnapshot: string | null;
+  environmentApiBaseUrlSnapshot: string | null;
+  createdAt: string;
+  updatedAt: string;
+}

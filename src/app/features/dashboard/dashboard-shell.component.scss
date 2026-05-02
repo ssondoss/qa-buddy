@@ -63,16 +63,22 @@
 
 .dashboard-nav__link:hover,
 .dashboard-nav__link:focus-visible {
-  border-color: rgba(246, 215, 84, 0.16);
-  background: rgba(246, 215, 84, 0.08);
+  border-color: rgba(53, 208, 186, 0.2);
+  background:
+    linear-gradient(135deg, rgba(53, 208, 186, 0.08), transparent 58%),
+    rgba(255, 255, 255, 0.035);
   color: var(--color-ink-900);
 }
 
 .dashboard-nav__link--active {
-  border-color: rgba(246, 215, 84, 0.24);
-  background: var(--dashboard-primary-soft);
-  color: var(--color-primary-yellow);
-  box-shadow: inset 3px 0 0 var(--color-primary-yellow);
+  border-color: rgba(53, 208, 186, 0.28);
+  background:
+    linear-gradient(135deg, rgba(53, 208, 186, 0.14), transparent 46%),
+    rgba(22, 29, 39, 0.96);
+  color: var(--color-accent-cyan);
+  box-shadow:
+    inset 3px 0 0 var(--color-accent-cyan),
+    0 12px 28px rgba(0, 0, 0, 0.22);
 }
 
 .dashboard-nav__link--muted {

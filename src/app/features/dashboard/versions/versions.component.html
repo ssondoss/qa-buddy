@@ -1,0 +1,423 @@
+<section class="versions-page">
+  <header class="versions-toolbar">
+    <div>
+      <h1>Versions</h1>
+    </div>
+  </header>
+
+  @if (error) {
+    <div class="versions-banner versions-banner--error">
+      <span>{{ error }}</span>
+      <button type="button" aria-label="Dismiss error" (click)="dismissError()">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+    </div>
+  }
+
+  <section class="versions-panel versions-workflow-card">
+    <div class="row g-2 align-items-start">
+      <div class="col-12 col-lg-4">
+        <label class="versions-field versions-workflow-select mb-0">
+          <span>Workflow</span>
+          <select
+            [value]="selectedWorkflowId"
+            (change)="selectWorkflowFromEvent($event)"
+            [disabled]="isLoadingWorkflows || !workflows.length"
+          >
+            <option value="">Select workflow</option>
+            @for (workflow of workflows; track workflow.id) {
+              <option [value]="workflow.id">{{ workflow.name }}</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      @if (selectedWorkflow; as workflow) {
+        <div class="col-12 col-lg-8">
+          <div class="versions-workflow-summary px-3 py-2">
+            <span class="d-block mb-1">Description</span>
+            {{ workflow.description || 'No description' }}
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <section class="versions-workspace">
+    <section class="row g-3">
+      <div class="col-12">
+        <aside class="versions-panel versions-panel--versions">
+          <header class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+            <div>
+              <p class="versions-eyebrow">Versions History</p>
+            </div>
+            <button
+              class="versions-button versions-button--sm"
+              type="button"
+              (click)="loadVersions()"
+              [disabled]="!selectedWorkflow || isLoadingVersions"
+            >
+              {{ isLoadingVersions ? 'Loading...' : 'Refresh' }}
+            </button>
+          </header>
+
+          @if (selectedVersion; as version) {
+            <div
+              class="versions-selected-version d-flex align-items-center justify-content-between gap-2 flex-wrap"
+            >
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <strong>v{{ version.versionNumber }}</strong>
+                <span class="versions-pill" [attr.data-status]="statusToken(version.status)">
+                  {{ statusLabel(version.status) }}
+                </span>
+                <span>{{ version.environmentNameSnapshot || 'No environment' }}</span>
+              </div>
+              <span>{{ formatDateTime(version.updatedAt) }}</span>
+            </div>
+          }
+
+          @if (!selectedWorkflow) {
+            <div class="versions-empty">Select a workflow.</div>
+          } @else if (isLoadingVersions) {
+            <div class="versions-empty">Loading versions...</div>
+          } @else if (versions.length) {
+            <div class="accordion versions-table-accordion" id="versionsTableAccordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button py-2"
+                    [class.collapsed]="!isVersionTableOpen"
+                    type="button"
+                    (click)="toggleVersionTable()"
+                    [attr.aria-expanded]="isVersionTableOpen"
+                    aria-controls="versionsTable"
+                  >
+                    Versions table
+                    <span class="versions-count ms-2">{{ versions.length }}</span>
+                  </button>
+                </h2>
+
+                <div
+                  id="versionsTable"
+                  class="accordion-collapse collapse"
+                  [class.show]="isVersionTableOpen"
+                >
+                  <div class="accordion-body p-0">
+                    <div class="versions-table-wrap">
+                      <table class="table table-sm mb-0 align-middle versions-version-table">
+                        <thead>
+                          <tr>
+                            <th>Version</th>
+                            <th>Environment</th>
+                            <th>Status</th>
+                            <th>Updated</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (version of versions; track version.versionId) {
+                            <tr
+                              class="versions-version-row"
+                              [class.versions-version-row--active]="
+                                version.versionId === selectedVersionId
+                              "
+                              (click)="selectVersion(version.versionId)"
+                            >
+                              <td>
+                                <strong>v{{ version.versionNumber }}</strong>
+                              </td>
+                              <td>
+                                <span>{{
+                                  version.environmentNameSnapshot || 'No environment'
+                                }}</span>
+                              </td>
+                              <td>
+                                <span
+                                  class="versions-pill"
+                                  [attr.data-status]="statusToken(version.status)"
+                                >
+                                  {{ statusLabel(version.status) }}
+                                </span>
+                              </td>
+                              <td>
+                                <span>{{ formatDateTime(version.updatedAt) }}</span>
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div class="versions-empty">No versions.</div>
+          }
+        </aside>
+      </div>
+    </section>
+
+    <section class="row g-3 align-items-start">
+      <div class="col-12">
+        <section class="versions-panel versions-panel--steps">
+          <header class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+            <div>
+              <p class="versions-eyebrow">Ordered steps</p>
+            </div>
+
+            <div class="versions-actions">
+              <button
+                class="versions-button versions-button--primary"
+                type="button"
+                (click)="openCreateStep()"
+                [disabled]="!canEditSteps"
+              >
+                Add Step
+              </button>
+            </div>
+          </header>
+
+          @if (success) {
+            <div class="versions-banner versions-banner--success versions-banner--steps">
+              <span>{{ success }}</span>
+              <button type="button" aria-label="Dismiss success" (click)="dismissSuccess()">
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+              </button>
+            </div>
+          }
+
+          @if (!selectedVersionId) {
+            <div class="versions-empty">Select a version.</div>
+          } @else if (selectedVersionIsRecording) {
+            <p class="versions-note">Recording versions are read-only.</p>
+          } @else if (isLoadingSteps) {
+            <div class="versions-empty">Loading steps...</div>
+          } @else if (steps.length) {
+            <div class="accordion versions-table-accordion versions-step-accordion">
+              <div class="accordion-item">
+                <h2 class="accordion-header">
+                  <button
+                    class="accordion-button py-2"
+                    [class.collapsed]="!isStepTableOpen"
+                    type="button"
+                    (click)="toggleStepTable()"
+                    [attr.aria-expanded]="isStepTableOpen"
+                    aria-controls="stepsTable"
+                  >
+                    Steps table
+                    <span class="versions-count ms-2">{{ steps.length }}</span>
+                  </button>
+                </h2>
+
+                <div
+                  id="stepsTable"
+                  class="accordion-collapse collapse"
+                  [class.show]="isStepTableOpen"
+                >
+                  <div class="accordion-body p-0">
+                    <div class="versions-step-table">
+                      <table class="table table-sm mb-0 align-middle">
+                        <thead>
+                          <tr>
+                            <th class="text-center" aria-label="Reorder"></th>
+                            <th>Order</th>
+                            <th>Action</th>
+                            <th class="w-100">Selector</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (step of steps; track step.id; let rowIndex = $index) {
+                            <tr
+                              class="versions-step-row"
+                              [class.versions-step-row--active]="isSelectedStep(step)"
+                              [class.versions-step-row--dragging]="isDraggingStep(step)"
+                              [class.versions-step-row--drop-target]="isDropTarget(step)"
+                              (click)="selectStep(step)"
+                              (dragenter)="dragOverStep($event, step)"
+                              (dragover)="dragOverStep($event, step)"
+                              (dragleave)="leaveStepDrag(step)"
+                              (drop)="dropStep($event, step)"
+                            >
+                              <td class="versions-drag-cell text-center">
+                                <span
+                                  class="versions-drag-handle d-inline-flex"
+                                  draggable="true"
+                                  title="Drag to reorder"
+                                  aria-hidden="true"
+                                  (click)="$event.stopPropagation()"
+                                  (dragstart)="
+                                    startStepDrag($event, step); $event.stopPropagation()
+                                  "
+                                  (dragend)="endStepDrag()"
+                                >
+                                  <i class="bi bi-grip-horizontal m-auto"></i>
+                                </span>
+                              </td>
+                              <td>{{ rowIndex + 1 }}</td>
+                              <td>{{ statusLabel(step.action) }}</td>
+                              <td class="text-break text-arabic w-100" dir="auto">
+                                {{ step.selector || '-' }}
+                              </td>
+                            </tr>
+                          }
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div class="versions-empty">No steps.</div>
+          }
+        </section>
+      </div>
+
+      <div class="col-12">
+        <aside class="versions-panel versions-panel--inspector">
+          <header class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+            <div>
+              <p class="versions-eyebrow">{{ isCreatingStep ? 'New step' : 'Step details' }}</p>
+        
+            </div>
+            @if (selectedStep && !isCreatingStep) {
+              <button
+                class="versions-button versions-button--danger"
+                type="button"
+                (click)="deleteSelectedStep()"
+                [disabled]="!canEditSteps || isSavingStep || !editingStepId"
+              >
+                Delete
+              </button>
+            }
+          </header>
+
+          @if (!canEditSteps) {
+            <p class="versions-note">Select a ready or draft version to edit steps.</p>
+          }
+
+          <form
+            class="versions-step-form"
+            [formGroup]="stepForm"
+            (ngSubmit)="saveStep()"
+            novalidate
+          >
+            <section class="versions-step-section">
+              <p class="versions-section-title">Basics</p>
+              <div class="row g-2">
+                <label class="versions-field col-12 col-md-6 col-xl-3">
+                  <span>Action</span>
+                  <select
+                    formControlName="action"
+                    [class.versions-field--invalid]="isStepFieldInvalid('action')"
+                  >
+                    @for (action of stepActions; track action) {
+                      <option [value]="action">{{ statusLabel(action) }}</option>
+                    }
+                  </select>
+                </label>
+
+                <label class="versions-field col-12 col-md-6 col-xl-3">
+                  <span>Source</span>
+                  <select
+                    formControlName="source"
+                    [class.versions-field--invalid]="isStepFieldInvalid('source')"
+                  >
+                    @for (source of stepSources; track source) {
+                      <option [value]="source">{{ statusLabel(source) }}</option>
+                    }
+                  </select>
+                </label>
+
+                <label class="versions-field col-6 col-xl-2">
+                  <span>Timeout</span>
+                  <input
+                    type="number"
+                    min="0"
+                    formControlName="timeoutMs"
+                    [class.versions-field--invalid]="isStepFieldInvalid('timeoutMs')"
+                  />
+                </label>
+
+                <label class="versions-field col-6 col-xl-2">
+                  <span>Retry</span>
+                  <input
+                    type="number"
+                    min="0"
+                    formControlName="retryCount"
+                    [class.versions-field--invalid]="isStepFieldInvalid('retryCount')"
+                  />
+                </label>
+
+                <label class="versions-check col-12 col-xl-2 pt-2">
+                  <input type="checkbox" formControlName="optional" />
+                  <span>Optional</span>
+                </label>
+              </div>
+            </section>
+
+            <section class="versions-step-section">
+              <p class="versions-section-title">Target</p>
+              <div class="row g-2">
+                <label class="versions-field col-12 col-xl-4">
+                  <span>Selector</span>
+                  <input
+                    type="text"
+                    formControlName="selector"
+                    placeholder="button[type='submit']"
+                  />
+                </label>
+
+                <label class="versions-field col-12 col-md-6 col-xl-4">
+                  <span>Value</span>
+                  <input type="text" formControlName="value" placeholder="/login or typed value" />
+                </label>
+
+                <label class="versions-field col-12 col-md-6 col-xl-4">
+                  <span>Expected Value</span>
+                  <input
+                    type="text"
+                    formControlName="expectedValue"
+                    placeholder="Expected text or API response"
+                  />
+                </label>
+              </div>
+            </section>
+
+            <section class="versions-step-section">
+              <p class="versions-section-title">Advanced</p>
+              <div class="versions-json-editor">
+                <div class="versions-field">
+                  <span>Meta JSON</span>
+                  <code-editor
+                  formControlName="meta"
+                    [setup]="'minimal'"
+                    [theme]="'dark'"
+                    [lineWrapping]="true"
+                    [indentWithTab]="true"
+                    [extensions]="metaEditorExtensions"
+                  placeholder='{"note":"manual check"}'
+                  [class.versions-field--invalid]="isStepFieldInvalid('meta')"
+                  ></code-editor>
+                </div>
+                @if (isStepFieldInvalid('meta')) {
+                  <small>Use a JSON object.</small>
+                }
+              </div>
+            </section>
+
+            <div class="d-flex justify-content-end">
+              <button
+                class="versions-button versions-button--primary versions-button--submit"
+                type="submit"
+                [disabled]="!canEditSteps || isSavingStep || (!isCreatingStep && !editingStepId)"
+              >
+                {{ isSavingStep ? 'Saving...' : formModeLabel }}
+              </button>
+            </div>
+          </form>
+        </aside>
+      </div>
+    </section>
+  </section>
+</section>

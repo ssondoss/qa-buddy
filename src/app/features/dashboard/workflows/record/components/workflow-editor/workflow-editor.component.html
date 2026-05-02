@@ -12,6 +12,8 @@
             class="workflow-action"
             [class.workflow-action--primary]="isFirst"
             type="button"
+            [disabled]="!canEdit || isSaving"
+            (click)="requestAddStep(action.kind)"
           >
             {{ action.label }}
           </button>

@@ -16,14 +16,14 @@ interface ScheduleItem {
   styleUrl: './scheduled.component.scss',
 })
 export class ScheduledComponent {
-  protected readonly metrics = [
+  readonly metrics = [
     { label: 'Schedules', value: '14' },
     { label: 'Active', value: '11' },
     { label: 'Paused', value: '3' },
     { label: 'Next 24h', value: '28' },
   ];
 
-  protected readonly schedules: readonly ScheduleItem[] = [
+  readonly schedules: readonly ScheduleItem[] = [
     {
       name: 'Checkout Staging Hourly',
       workflow: 'Checkout Smoke',
@@ -50,3 +50,4 @@ export class ScheduledComponent {
     },
   ];
 }
+

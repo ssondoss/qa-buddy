@@ -3,31 +3,43 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import type {
-  CreateWorkflowResponse,
-  StartRecordingResponse,
-  WorkflowListResponse,
+  VersionView,
   WorkflowRecordingStartRequest,
-  WorkflowRequest,
+  WorkflowResponse,
+  WorkflowUpsertRequest,
 } from '../models/workflow.model';
 
 @Injectable({ providedIn: 'root' })
 export class WorkflowService {
   private readonly base = `${environment.apiHost}/api/workflows`;
+  private readonly recordingBase = `${environment.apiHost}/api/version/recording`;
 
   constructor(private readonly http: HttpClient) {}
 
-  list(): Observable<WorkflowListResponse> {
-    return this.http.get<WorkflowListResponse>(this.base);
+  list(): Observable<WorkflowResponse[]> {
+    return this.http.get<WorkflowResponse[]>(this.base);
   }
 
-  create(payload: WorkflowRequest): Observable<CreateWorkflowResponse> {
-    return this.http.post<CreateWorkflowResponse>(this.base, payload);
+  get(workflowId: string): Observable<WorkflowResponse> {
+    return this.http.get<WorkflowResponse>(`${this.base}/${workflowId}`);
+  }
+
+  versions(workflowId: string): Observable<VersionView[]> {
+    return this.http.get<VersionView[]>(`${this.base}/${workflowId}/versions`);
+  }
+
+  create(payload: WorkflowUpsertRequest): Observable<WorkflowResponse> {
+    return this.http.post<WorkflowResponse>(this.base, payload);
+  }
+
+  update(workflowId: string, payload: WorkflowUpsertRequest): Observable<WorkflowResponse> {
+    return this.http.put<WorkflowResponse>(`${this.base}/${workflowId}`, payload);
   }
 
   startRecording(
     workflowId: string,
     payload: WorkflowRecordingStartRequest,
-  ): Observable<StartRecordingResponse> {
-    return this.http.post<StartRecordingResponse>(`${this.base}/${workflowId}/versions/start`, payload);
+  ): Observable<WorkflowResponse> {
+    return this.http.post<WorkflowResponse>(`${this.recordingBase}/start/${workflowId}`, payload);
   }
 }

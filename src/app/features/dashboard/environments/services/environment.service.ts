@@ -2,12 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
-import type {
-  EnvironmentDeleteResponse,
-  EnvironmentItemResponse,
-  EnvironmentListResponse,
-  EnvironmentRequest,
-} from '../models/environment.model';
+import type { EnvironmentRequest, EnvironmentResponse } from '../models/environment.model';
 
 @Injectable({ providedIn: 'root' })
 export class EnvironmentService {
@@ -15,23 +10,23 @@ export class EnvironmentService {
 
   constructor(private readonly http: HttpClient) {}
 
-  list(): Observable<EnvironmentListResponse> {
-    return this.http.get<EnvironmentListResponse>(this.base);
+  list(): Observable<EnvironmentResponse[]> {
+    return this.http.get<EnvironmentResponse[]>(this.base);
   }
 
-  get(id: string): Observable<EnvironmentItemResponse> {
-    return this.http.get<EnvironmentItemResponse>(`${this.base}/${id}`);
+  get(id: string): Observable<EnvironmentResponse> {
+    return this.http.get<EnvironmentResponse>(`${this.base}/${id}`);
   }
 
-  create(payload: EnvironmentRequest): Observable<EnvironmentItemResponse> {
-    return this.http.post<EnvironmentItemResponse>(this.base, payload);
+  create(payload: EnvironmentRequest): Observable<EnvironmentResponse> {
+    return this.http.post<EnvironmentResponse>(this.base, payload);
   }
 
-  update(id: string, payload: EnvironmentRequest): Observable<EnvironmentItemResponse> {
-    return this.http.put<EnvironmentItemResponse>(`${this.base}/${id}`, payload);
+  update(id: string, payload: EnvironmentRequest): Observable<EnvironmentResponse> {
+    return this.http.put<EnvironmentResponse>(`${this.base}/${id}`, payload);
   }
 
-  delete(id: string): Observable<EnvironmentDeleteResponse> {
-    return this.http.delete<EnvironmentDeleteResponse>(`${this.base}/${id}`);
+  delete(id: string): Observable<EnvironmentResponse | null> {
+    return this.http.delete<EnvironmentResponse | null>(`${this.base}/${id}`);
   }
 }

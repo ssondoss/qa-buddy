@@ -1,10 +1,14 @@
 @use './app/features/auth/auth-shell';
+@import '@fontsource/cairo/400.css';
+@import '@fontsource/cairo/500.css';
+@import '@fontsource/cairo/700.css';
 
 :root {
   color-scheme: dark;
 
   --font-sans: 'Inter', 'Avenir Next', 'Segoe UI', sans-serif;
   --font-display: 'Inter', 'Avenir Next', 'Segoe UI', sans-serif;
+  --font-arabic: 'Cairo', 'Noto Sans Arabic', 'Segoe UI', Tahoma, Arial, sans-serif;
 
   --color-ink-900: #f8fafc;
   --color-ink-850: #e5e7eb;
@@ -196,4 +200,9 @@ body {
 .workflows-pill[data-status='review'] {
   background: var(--color-primary-yellow-soft);
   color: var(--color-primary-yellow);
+}
+
+.text-arabic {
+  font-family: var(--font-arabic);
+  line-height: 1.65;
 }

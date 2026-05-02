@@ -1,11 +1,9 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { Component, DestroyRef, OnDestroy, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PortfolioFooterComponent } from '../../shared/components/portfolio-footer/portfolio-footer.component';
 import { AuthService } from './auth.service';
-import { ApiErrorResponse } from './models/auth.model';
 
 @Component({
   selector: 'app-register',
@@ -15,10 +13,10 @@ import { ApiErrorResponse } from './models/auth.model';
   styleUrl: './register.component.scss',
 })
 export class RegisterComponent implements OnDestroy {
-  private readonly destroyRef = inject(DestroyRef);
-  private readonly formBuilder = inject(FormBuilder);
-  private readonly authService = inject(AuthService);
-  private resendCooldownTimerId: number | null = null;
+  readonly destroyRef = inject(DestroyRef);
+  readonly formBuilder = inject(FormBuilder);
+  readonly authService = inject(AuthService);
+  resendCooldownTimerId: number | null = null;
 
   isSubmitting = false;
   isResendingVerification = false;
@@ -56,8 +54,8 @@ export class RegisterComponent implements OnDestroy {
       .register(this.form.getRawValue())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (response) => {
-          this.success = response.message;
+        next: () => {
+          this.success = 'Registration successful. Check your email to verify your account.';
           this.canShowResend = true;
           this.startResendCooldown();
           this.form.controls.password.reset('');
@@ -65,9 +63,8 @@ export class RegisterComponent implements OnDestroy {
           this.form.controls.password.markAsUntouched();
           this.isSubmitting = false;
         },
-        error: (error: HttpErrorResponse) => {
-          const payload = error.error as ApiErrorResponse;
-          this.error = payload.message;
+        error: (error: Error) => {
+          this.error = error.message;
           this.isSubmitting = false;
         },
       });
@@ -91,12 +88,11 @@ export class RegisterComponent implements OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.resendMessage = response.data.message;
+          this.resendMessage = response.message;
           this.isResendingVerification = false;
         },
-        error: (error: HttpErrorResponse) => {
-          const payload = error.error as ApiErrorResponse;
-          this.error = payload.message;
+        error: (error: Error) => {
+          this.error = error.message;
           this.isResendingVerification = false;
         },
       });
@@ -113,7 +109,7 @@ export class RegisterComponent implements OnDestroy {
     }
   }
 
-  private startResendCooldown(): void {
+  startResendCooldown(): void {
     if (this.resendCooldownTimerId !== null) {
       window.clearInterval(this.resendCooldownTimerId);
     }
@@ -130,3 +126,4 @@ export class RegisterComponent implements OnDestroy {
     }, 1000);
   }
 }
+

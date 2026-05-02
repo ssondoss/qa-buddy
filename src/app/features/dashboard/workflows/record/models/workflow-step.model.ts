@@ -9,6 +9,7 @@ export interface WorkflowLocator {
 
 export interface WorkflowStep {
   id: string;
+  stepId?: string;
   order: number;
   sourceLine: number;
   kind: WorkflowStepKind;
