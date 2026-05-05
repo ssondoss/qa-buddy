@@ -72,7 +72,19 @@
                 </span>
                 <span>{{ version.environmentNameSnapshot || 'No environment' }}</span>
               </div>
-              <span>{{ formatDateTime(version.updatedAt) }}</span>
+              <div class="d-flex align-items-center gap-2">
+                <span>{{ formatDateTime(version.updatedAt) }}</span>
+                @if (version.status === 'READY') {
+                  <button
+                    class="versions-button versions-button--primary versions-button--sm"
+                    type="button"
+                    [disabled]="isExecuting"
+                    (click)="executeSelectedVersion()"
+                  >
+                    {{ isExecuting ? 'Running...' : 'Run' }}
+                  </button>
+                }
+              </div>
             </div>
           }
 
@@ -419,5 +431,68 @@
         </aside>
       </div>
     </section>
+
+    @if (lastExecution) {
+      <section class="row g-3">
+        <div class="col-12">
+          <section class="versions-panel versions-panel--results">
+            <header class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+              <div class="d-flex align-items-center gap-2">
+                <p class="versions-eyebrow mb-0">Execution Results</p>
+                <span
+                  class="versions-pill"
+                  [attr.data-status]="statusToken(lastExecution.status)"
+                >
+                  {{ statusLabel(lastExecution.status) }}
+                </span>
+              </div>
+              <button
+                class="versions-button versions-button--sm"
+                type="button"
+                (click)="lastExecution = null"
+              >
+                Dismiss
+              </button>
+            </header>
+
+            <div class="versions-results-list">
+              @for (step of lastExecution.stepResults; track step.stepId) {
+                <article
+                  class="versions-result-row"
+                  [class.versions-result-row--failed]="step.status === 'FAILED'"
+                  [class.versions-result-row--skipped]="step.status === 'SKIPPED'"
+                >
+                  <div class="versions-result-meta">
+                    <span class="versions-result-index">{{ step.orderIndex }}</span>
+                    <span class="versions-result-action">{{ statusLabel(stepResultAction(step)) }}</span>
+                    <span class="versions-result-selector">{{ stepResultSelector(step) || '—' }}</span>
+                    <span
+                      class="versions-pill versions-pill--sm"
+                      [attr.data-status]="statusToken(step.status)"
+                    >
+                      {{ statusLabel(step.status) }}
+                    </span>
+                  </div>
+
+                  @if (step.errorMessage) {
+                    <p class="versions-result-error">{{ step.errorMessage }}</p>
+                  }
+
+                  @if (screenshotUrl(step.screenshotUrl); as url) {
+                    <a [href]="url" target="_blank" class="versions-result-screenshot-link">
+                      <img
+                        [src]="url"
+                        alt="Step {{ step.orderIndex }} screenshot"
+                        class="versions-result-screenshot"
+                      />
+                    </a>
+                  }
+                </article>
+              }
+            </div>
+          </section>
+        </div>
+      </section>
+    }
   </section>
 </section>

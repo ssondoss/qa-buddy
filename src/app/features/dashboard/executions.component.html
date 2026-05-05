@@ -3,11 +3,25 @@
     <h1>Executions</h1>
 
     <div class="ops-page__actions">
-      <button class="ops-button ops-button--primary" type="button">Run Selected</button>
-      <button class="ops-button" type="button">Retry Failed</button>
-      <button class="ops-button" type="button">Export Logs</button>
+      <select
+        class="ops-select"
+        [value]="selectedWorkflowId"
+        (change)="onWorkflowSelect($event)"
+        [disabled]="isLoadingWorkflows"
+      >
+        @for (workflow of workflows; track workflow.id) {
+          <option [value]="workflow.id">{{ workflow.name }}</option>
+        }
+        @if (!workflows.length) {
+          <option value="">No workflows</option>
+        }
+      </select>
     </div>
   </header>
+
+  @if (error) {
+    <div class="ops-banner ops-banner--error">{{ error }}</div>
+  }
 
   <section class="ops-metrics">
     @for (metric of metrics; track metric.label) {
@@ -21,54 +35,64 @@
   <section class="ops-grid">
     <section class="ops-panel">
       <header class="ops-panel__header">
-        <h2>Execution Queue</h2>
+        <h2>Execution History</h2>
       </header>
 
-      <div class="ops-table-wrap">
-        <table class="ops-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Workflow</th>
-              <th>Environment</th>
-              <th>Trigger</th>
-              <th>Status</th>
-              <th>Duration</th>
-              <th>Started</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (execution of executions; track execution.id) {
+      @if (isLoadingExecutions) {
+        <div class="ops-empty">Loading...</div>
+      } @else if (!selectedWorkflowId) {
+        <div class="ops-empty">Select a workflow.</div>
+      } @else if (!executions.length) {
+        <div class="ops-empty">No executions yet.</div>
+      } @else {
+        <div class="ops-table-wrap">
+          <table class="ops-table">
+            <thead>
               <tr>
-                <td>{{ execution.id }}</td>
-                <td>{{ execution.workflow }}</td>
-                <td>{{ execution.environment }}</td>
-                <td>{{ execution.trigger }}</td>
-                <td>
-                  <span class="status-pill" [attr.data-status]="execution.status.toLowerCase()">
-                    {{ execution.status }}
-                  </span>
-                </td>
-                <td>{{ execution.duration }}</td>
-                <td>{{ execution.startedAt }}</td>
+                <th>ID</th>
+                <th>Version</th>
+                <th>Environment</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th>Started</th>
               </tr>
-            }
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              @for (execution of executions; track execution.id) {
+                <tr>
+                  <td>
+                    <code>{{ shortId(execution.id) }}</code>
+                  </td>
+                  <td>v{{ execution.versionNumber }}</td>
+                  <td>{{ execution.environmentNameSnapshot || '—' }}</td>
+                  <td>
+                    <span class="status-pill" [attr.data-status]="statusToken(execution.status)">
+                      {{ statusLabel(execution.status) }}
+                    </span>
+                  </td>
+                  <td>{{ formatDuration(execution.startedAt, execution.finishedAt) }}</td>
+                  <td>{{ formatDateTime(execution.startedAt) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
     </section>
 
     <aside class="ops-panel ops-side">
       <h2>Running</h2>
 
-      @for (execution of executions; track execution.id) {
-        @if (execution.status === 'Running') {
+      @if (runningExecutions.length) {
+        @for (execution of runningExecutions; track execution.id) {
           <article class="ops-side__item">
-            <strong>{{ execution.workflow }}</strong>
-            <span>{{ execution.environment }}</span>
-            <span>{{ execution.duration }}</span>
+            <strong>v{{ execution.versionNumber }}</strong>
+            <span>{{ execution.environmentNameSnapshot || '—' }}</span>
+            <span>{{ formatDateTime(execution.startedAt) }}</span>
           </article>
         }
+      } @else {
+        <p class="ops-side__empty">None running.</p>
       }
     </aside>
   </section>

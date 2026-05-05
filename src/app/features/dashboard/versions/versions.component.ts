@@ -19,6 +19,9 @@ import type {
 import { StepService } from '../workflows/steps/services/step.service';
 import type { VersionView, WorkflowResponse } from '../workflows/models/workflow.model';
 import { WorkflowService } from '../workflows/services/workflow.service';
+import { ExecutionService } from '../executions/services/execution.service';
+import type { ExecutionView, ExecutionStepResultView } from '../executions/models/execution.model';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-versions',
@@ -49,6 +52,8 @@ export class VersionsComponent implements OnInit {
   isSavingStep = false;
   isVersionTableOpen = true;
   isStepTableOpen = true;
+  isExecuting = false;
+  lastExecution: ExecutionView | null = null;
   error: string | null = null;
   success: string | null = null;
   private notificationTimer: ReturnType<typeof setTimeout> | null = null;
@@ -81,6 +86,7 @@ export class VersionsComponent implements OnInit {
   constructor(
     readonly stepService: StepService,
     readonly workflowService: WorkflowService,
+    readonly executionService: ExecutionService,
   ) {
     this.destroyRef.onDestroy(() => this.clearNotificationTimer());
     this.stepForm.controls.source.disable();
@@ -117,6 +123,10 @@ export class VersionsComponent implements OnInit {
     return Boolean(this.selectedVersionId) && !this.selectedVersionIsRecording;
   }
 
+  get canExecuteVersion(): boolean {
+    return this.selectedVersion?.status === 'READY' && !this.isExecuting;
+  }
+
   get formModeLabel(): string {
     return this.isCreatingStep ? 'Create Step' : 'Update Step';
   }
@@ -140,6 +150,39 @@ export class VersionsComponent implements OnInit {
         error: (err: Error) => {
           this.error = this.messageFromError(err, 'Failed to load workflows');
           this.isLoadingWorkflows = false;
+        },
+      });
+  }
+
+  executeSelectedVersion(): void {
+    const workflowId = this.selectedWorkflowId;
+    const versionId = this.selectedVersionId;
+
+    if (!workflowId || !versionId || !this.canExecuteVersion) {
+      return;
+    }
+
+    this.isExecuting = true;
+    this.lastExecution = null;
+    this.error = null;
+    this.success = null;
+
+    this.executionService
+      .execute(workflowId, versionId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.isExecuting = false;
+          this.lastExecution = result;
+          if (result.status === 'PASSED') {
+            this.setSuccess(`Execution passed — v${this.selectedVersion?.versionNumber ?? ''}`);
+          } else {
+            this.error = `Execution ${result.status.toLowerCase().replace(/_/g, ' ')} — see results below`;
+          }
+        },
+        error: (err: Error) => {
+          this.isExecuting = false;
+          this.error = this.messageFromError(err, 'Execution failed');
         },
       });
   }
@@ -684,6 +727,18 @@ export class VersionsComponent implements OnInit {
     } catch {
       return { jsonObject: true };
     }
+  }
+
+  screenshotUrl(relativePath: string | null): string | null {
+    return relativePath ? `${environment.apiHost}${relativePath}` : null;
+  }
+
+  stepResultAction(step: ExecutionStepResultView): string {
+    return String(step.stepSnapshot['action'] ?? '');
+  }
+
+  stepResultSelector(step: ExecutionStepResultView): string {
+    return String(step.stepSnapshot['selector'] ?? step.stepSnapshot['value'] ?? '');
   }
 
   messageFromError(error: Error, fallback: string): string {
