@@ -1,7 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
+import type { PaginatedResponse } from '../../../../shared/api-response.model';
 import type {
   VersionView,
   WorkflowRecordingStartRequest,
@@ -16,16 +17,18 @@ export class WorkflowService {
 
   constructor(private readonly http: HttpClient) {}
 
-  list(): Observable<WorkflowResponse[]> {
-    return this.http.get<WorkflowResponse[]>(this.base);
+  list(page = 0, size = 10): Observable<PaginatedResponse<WorkflowResponse>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PaginatedResponse<WorkflowResponse>>(this.base, { params });
   }
 
   get(workflowId: string): Observable<WorkflowResponse> {
     return this.http.get<WorkflowResponse>(`${this.base}/${workflowId}`);
   }
 
-  versions(workflowId: string): Observable<VersionView[]> {
-    return this.http.get<VersionView[]>(`${this.base}/${workflowId}/versions`);
+  versions(workflowId: string, page = 0, size = 5): Observable<PaginatedResponse<VersionView>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PaginatedResponse<VersionView>>(`${this.base}/${workflowId}/versions`, { params });
   }
 
   create(payload: WorkflowUpsertRequest): Observable<WorkflowResponse> {
@@ -34,6 +37,14 @@ export class WorkflowService {
 
   update(workflowId: string, payload: WorkflowUpsertRequest): Observable<WorkflowResponse> {
     return this.http.put<WorkflowResponse>(`${this.base}/${workflowId}`, payload);
+  }
+
+  delete(workflowId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${workflowId}`);
+  }
+
+  deleteVersion(workflowId: string, versionId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/${workflowId}/versions/${versionId}`);
   }
 
   startRecording(

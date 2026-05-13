@@ -115,8 +115,8 @@
                   [class.show]="isVersionTableOpen"
                 >
                   <div class="accordion-body p-0">
-                    <div class="versions-table-wrap">
-                      <table class="table table-sm mb-0 align-middle versions-version-table">
+                    <div class="versions-table-wrap main-table-wrap">
+                      <table class="table table-sm mb-0 align-middle versions-version-table main-table">
                         <thead>
                           <tr>
                             <th>Version</th>
@@ -128,7 +128,8 @@
                         <tbody>
                           @for (version of versions; track version.versionId) {
                             <tr
-                              class="versions-version-row"
+                              class="versions-version-row main-table-row"
+                              [class.main-table-row--active]="version.versionId === selectedVersionId"
                               [class.versions-version-row--active]="
                                 version.versionId === selectedVersionId
                               "
@@ -227,8 +228,8 @@
                   [class.show]="isStepTableOpen"
                 >
                   <div class="accordion-body p-0">
-                    <div class="versions-step-table">
-                      <table class="table table-sm mb-0 align-middle">
+                    <div class="versions-step-table main-table-wrap">
+                      <table class="table table-sm mb-0 align-middle main-table">
                         <thead>
                           <tr>
                             <th class="text-center" aria-label="Reorder"></th>
@@ -240,7 +241,8 @@
                         <tbody>
                           @for (step of steps; track step.id; let rowIndex = $index) {
                             <tr
-                              class="versions-step-row"
+                              class="versions-step-row main-table-row"
+                              [class.main-table-row--active]="isSelectedStep(step)"
                               [class.versions-step-row--active]="isSelectedStep(step)"
                               [class.versions-step-row--dragging]="isDraggingStep(step)"
                               [class.versions-step-row--drop-target]="isDropTarget(step)"

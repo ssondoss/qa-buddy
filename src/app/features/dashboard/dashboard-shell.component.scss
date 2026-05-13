@@ -7,10 +7,6 @@
   min-height: 100vh;
   display: grid;
   grid-template-columns: 16rem minmax(0, 1fr);
-  background:
-    linear-gradient(120deg, rgba(246, 215, 84, 0.06), transparent 28%),
-    linear-gradient(300deg, rgba(53, 208, 186, 0.06), transparent 30%),
-    linear-gradient(180deg, var(--dashboard-bg-950), var(--dashboard-bg-930));
 }
 
 .dashboard-sidebar {

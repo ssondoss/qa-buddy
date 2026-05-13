@@ -7,6 +7,15 @@ export interface ApiResponse<T> {
   timestamp: string;
 }
 
+export interface PaginatedResponse<T> {
+  items: T[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+  last: boolean;
+}
+
 export class ApiClientError extends Error {
   constructor(
     message: string,

@@ -94,12 +94,12 @@ export class ExecutionsComponent implements OnInit {
       .list()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (workflows) => {
-          this.workflows = workflows;
+        next: (response) => {
+          this.workflows = response.items;
           this.isLoadingWorkflows = false;
-          if (workflows.length) {
-            this.selectedWorkflowId = workflows[0].id;
-            this.loadExecutions(workflows[0].id);
+          if (response.items.length) {
+            this.selectedWorkflowId = response.items[0].id;
+            this.loadExecutions(response.items[0].id);
           }
         },
         error: (err: Error) => {

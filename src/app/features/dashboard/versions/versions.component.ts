@@ -135,11 +135,11 @@ export class VersionsComponent implements OnInit {
     this.isLoadingWorkflows = true;
 
     this.workflowService
-      .list()
+      .list(0, 100)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.workflows = response;
+          this.workflows = response.items;
           this.selectedWorkflowId = this.resolveWorkflowId();
           this.isLoadingWorkflows = false;
 
@@ -221,12 +221,12 @@ export class VersionsComponent implements OnInit {
     this.steps = [];
 
     this.workflowService
-      .versions(workflow.id)
+      .versions(workflow.id, 0, 100)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response) => {
-          this.versions = response;
-          this.selectedVersionId = this.resolveVersionId(response, preferredVersionId);
+          this.versions = response.items;
+          this.selectedVersionId = this.resolveVersionId(response.items, preferredVersionId);
           this.isLoadingVersions = false;
           this.updateUrl();
 
