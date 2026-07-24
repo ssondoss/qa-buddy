@@ -18,6 +18,7 @@ export interface LoginResponseData {
   expiresAt: string;
   userId: string;
   email: string;
+  refreshToken: string;
 }
 
 export interface ResendVerificationResponseData {
@@ -26,3 +27,4 @@ export interface ResendVerificationResponseData {
 }
 
 export const AUTH_TOKEN_STORAGE_KEY = 'qaBuddyAuthToken';
+export const REFRESH_TOKEN_STORAGE_KEY = 'qaBuddyRefreshToken';

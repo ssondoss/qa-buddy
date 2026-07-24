@@ -1,196 +1,320 @@
-<section class="env-page">
-  <header class="env-toolbar">
-    <div>
-      <p class="env-eyebrow">Configuration</p>
-      <h1>Environments</h1>
-    </div>
-
-    <div class="env-actions">
-      <button class="env-button env-button--primary" type="button" (click)="openCreateForm()">
-        New Environment
-      </button>
-      <button class="env-button" type="button" (click)="loadEnvironments()" [disabled]="isLoading">
-        {{ isLoading ? 'Refreshing...' : 'Refresh' }}
-      </button>
-    </div>
-  </header>
-
-  @if (showForm) {
-    <section class="env-panel">
-      <header class="env-panel__header">
-        <div>
-          <p class="env-eyebrow">{{ editingEnvironmentId ? 'Edit' : 'Create' }}</p>
-          <h2>{{ editingEnvironmentId ? 'Edit environment' : 'Create environment' }}</h2>
+<section class="d-grid gap-4">
+  <div class="col-12">
+    <section class="surface-panel p-4">
+      <header class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+        <div class="d-flex align-items-center gap-2">
+          <p class="text-eyebrow text--primary mb-0">Environments</p>
+          <span class="wf-count-badge">{{ environments.length }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <button
+            class="workflows-button button--outline-primary"
+            type="button"
+            (click)="openCreateModal()"
+          >
+            <i class="bi bi-plus-lg" aria-hidden="true"></i>
+            New Environment
+          </button>
+          <button
+            class="workflows-button button--outline-primary"
+            type="button"
+            (click)="loadEnvironments()"
+            [disabled]="isLoading"
+          >
+            <i
+              class="bi bi-arrow-clockwise"
+              [class.toolbar-spin]="isLoading"
+              aria-hidden="true"
+            ></i>
+            {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+          </button>
         </div>
       </header>
 
-      <form class="env-form" [formGroup]="form" (ngSubmit)="saveEnvironment()" novalidate>
-        <label class="env-field">
-          <span>Name</span>
-          <input
-            type="text"
-            formControlName="name"
-            placeholder="Staging"
-            maxlength="160"
-            [class.env-field__control--invalid]="isFieldInvalid('name')"
-          />
-          @if (isFieldInvalid('name')) {
-            <small class="env-field__error">
-              @if (form.controls.name.hasError('required')) {
-                Name is required.
-              } @else {
-                Use 160 characters or fewer.
-              }
-            </small>
-          }
-        </label>
-
-        <label class="env-field">
-          <span>Web Base URL</span>
-          <input
-            type="url"
-            formControlName="webBaseUrl"
-            placeholder="https://app.example.com"
-            [class.env-field__control--invalid]="isFieldInvalid('webBaseUrl')"
-          />
-          @if (isFieldInvalid('webBaseUrl')) {
-            <small class="env-field__error">Enter an absolute HTTP or HTTPS URL.</small>
-          }
-        </label>
-
-        <label class="env-field">
-          <span>API Base URL</span>
-          <input
-            type="url"
-            formControlName="apiBaseUrl"
-            placeholder="https://api.example.com"
-            [class.env-field__control--invalid]="isFieldInvalid('apiBaseUrl')"
-          />
-          @if (isFieldInvalid('apiBaseUrl')) {
-            <small class="env-field__error">Enter an absolute HTTP or HTTPS URL.</small>
-          }
-        </label>
-
-        <div class="env-form__actions">
-          <button class="env-button env-button--primary" type="submit" [disabled]="isSaving">
-            {{ isSaving ? 'Saving...' : 'Save Environment' }}
-          </button>
-          <button class="env-button" type="button" (click)="closeForm()" [disabled]="isSaving">
-            Cancel
-          </button>
+      @if (error) {
+        <div class="banner-panel banner-panel--error p-3 mt-3">
+          <span>{{ error }}</span>
         </div>
-      </form>
-    </section>
-  }
-
-  @if (error) {
-    <p class="env-banner env-banner--error">{{ error }}</p>
-  }
-
-  @if (success) {
-    <p class="env-banner env-banner--success">{{ success }}</p>
-  }
-
-  <section class="env-summary" aria-label="Environment metrics">
-    @for (metric of metrics; track metric.label) {
-      <article class="env-panel env-metric">
-        <span>{{ metric.label }}</span>
-        <strong>{{ metric.value }}</strong>
-      </article>
-    }
-  </section>
-
-  <section class="env-layout">
-    <section class="env-panel">
-      <header class="env-panel__header">
-        <div>
-          <p class="env-eyebrow">Active</p>
-          <h2>Environment list</h2>
-        </div>
-        <span class="env-panel__meta">{{ environments.length }} saved</span>
-      </header>
+      }
 
       @if (isLoading) {
-        <div class="env-empty">Loading environments...</div>
+        <div class="empty-state empty-state--panel mt-3">Loading environments...</div>
       } @else if (environments.length) {
-        <div class="env-table-wrap">
-          <table class="env-table">
+        <div class="main-table-wrap border-main mt-3">
+          <table class="table table-sm mb-0 align-middle main-table">
             <thead>
               <tr>
                 <th>Name</th>
-                <th>Web Base URL</th>
-                <th>API Base URL</th>
+                <th>Description</th>
                 <th>Updated</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
               @for (environment of environments; track environment.id) {
-                <tr
-                  [class.env-table__row--active]="environment.id === selectedEnvironmentId"
-                  (click)="selectEnvironment(environment.id)"
-                >
+                <tr>
                   <td><strong>{{ environment.name }}</strong></td>
-                  <td>{{ environment.webBaseUrl }}</td>
-                  <td>{{ environment.apiBaseUrl }}</td>
-                  <td>{{ formatDate(environment.updatedAt) }}</td>
+                  <td>
+                    <span class="env-description">{{ environment.description || 'No description' }}</span>
+                  </td>
+                  <td>{{ formatDateTime(environment.updatedAt) }}</td>
+                  <td (click)="$event.stopPropagation()">
+                    @if (confirmingDeleteId === environment.id) {
+                      <div class="d-flex align-items-center gap-1">
+                        <span class="delete-confirm-text">Sure?</span>
+                        <button
+                          class="workflows-button versions-btn step-btn--danger"
+                          type="button"
+                          [disabled]="isDeletingEnvironment"
+                          (click)="confirmDelete(environment)"
+                        >
+                          @if (isDeletingEnvironment) {
+                            <i class="bi bi-arrow-repeat versions-spin" aria-hidden="true"></i>
+                          } @else {
+                            Yes
+                          }
+                        </button>
+                        <button
+                          class="workflows-button versions-btn"
+                          type="button"
+                          (click)="cancelDelete()"
+                        >No</button>
+                      </div>
+                    } @else {
+                      <div class="d-flex align-items-center gap-1">
+                        <div class="version-execute-wrap">
+                          <button
+                            class="workflows-button versions-btn"
+                            type="button"
+                            (click)="openInfoModal(environment)"
+                            aria-label="View environment details"
+                          >
+                            <i class="bi bi-info-circle" aria-hidden="true"></i>
+                          </button>
+                          <span class="version-tooltip">View environment details</span>
+                        </div>
+                        <div class="version-execute-wrap">
+                          <button
+                            class="workflows-button versions-btn"
+                            type="button"
+                            (click)="openEditModal(environment)"
+                            aria-label="Edit environment"
+                          >
+                            <i class="bi bi-pencil" aria-hidden="true"></i>
+                          </button>
+                          <span class="version-tooltip">Edit environment</span>
+                        </div>
+                        <div class="version-execute-wrap">
+                          <button
+                            class="workflows-button versions-btn"
+                            type="button"
+                            (click)="openDuplicateModal(environment)"
+                            aria-label="Duplicate environment"
+                          >
+                            <i class="bi bi-files" aria-hidden="true"></i>
+                          </button>
+                          <span class="version-tooltip">Duplicate environment</span>
+                        </div>
+                        <div class="version-execute-wrap">
+                          <button
+                            class="workflows-button versions-btn step-btn--danger"
+                            type="button"
+                            (click)="requestDelete($event, environment)"
+                            aria-label="Delete environment"
+                          >
+                            <i class="bi bi-trash" aria-hidden="true"></i>
+                          </button>
+                          <span class="version-tooltip">Delete environment</span>
+                        </div>
+                      </div>
+                    }
+                  </td>
                 </tr>
               }
             </tbody>
           </table>
         </div>
       } @else {
-        <div class="env-empty">Create an environment to use in workflows.</div>
+        <div class="empty-state empty-state--panel mt-3">
+          Create an environment to use in workflows.
+        </div>
       }
     </section>
+  </div>
+</section>
 
-    <aside class="env-panel env-details">
-      @if (selectedEnvironment; as environment) {
-        <header class="env-panel__header">
+<!-- ── Environment details modal ─────────────────────────────────────────── -->
+@if (viewingEnvironment) {
+  <div class="version-modal-backdrop" role="dialog" aria-modal="true"
+       (click)="closeInfoModal()" (keydown.escape)="closeInfoModal()" tabindex="-1">
+    <div class="version-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header-area">
+        <div class="d-flex align-items-start justify-content-between gap-3">
           <div>
-            <p class="env-eyebrow">Selected</p>
-            <h2>{{ environment.name }}</h2>
+            <p class="text-eyebrow text--primary mb-1">Environment</p>
+            <h3 class="version-modal__title">{{ viewingEnvironment.name }}</h3>
           </div>
-        </header>
-
-        <dl class="env-info">
-          <div>
-            <dt>ID</dt>
-            <dd>{{ environment.id }}</dd>
-          </div>
-          <div>
-            <dt>Web Base URL</dt>
-            <dd>{{ environment.webBaseUrl }}</dd>
-          </div>
-          <div>
-            <dt>API Base URL</dt>
-            <dd>{{ environment.apiBaseUrl }}</dd>
-          </div>
-          <div>
-            <dt>Created</dt>
-            <dd>{{ formatDate(environment.createdAt) }}</dd>
-          </div>
-          <div>
-            <dt>Updated</dt>
-            <dd>{{ formatDate(environment.updatedAt) }}</dd>
-          </div>
-        </dl>
-
-        <div class="env-details__actions">
-          <button class="env-button env-button--primary" type="button" (click)="openEditForm(environment)">
-            Edit
-          </button>
-          <button
-            class="env-button env-button--danger"
-            type="button"
-            (click)="deleteEnvironment(environment)"
-            [disabled]="deletingEnvironmentId === environment.id"
-          >
-            {{ deletingEnvironmentId === environment.id ? 'Deleting...' : 'Delete' }}
+          <button class="version-modal__close" type="button" aria-label="Close" (click)="closeInfoModal()">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </div>
-      } @else {
-        <div class="env-empty">Select an environment.</div>
-      }
-    </aside>
-  </section>
-</section>
+      </div>
+      <div class="modal-footer-actions">
+        <button
+          class="workflows-button button--outline-primary versions-btn"
+          type="button"
+          (click)="editFromInfo()"
+        >
+          <i class="bi bi-pencil" aria-hidden="true"></i>
+          Edit
+        </button>
+      </div>
+      <div class="modal-field-list">
+        <div class="modal-field">
+          <span class="modal-field__label">ID</span>
+          <span class="modal-field__value modal-field__value--code text-break">{{ viewingEnvironment.id }}</span>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field__label">Description</span>
+          <span class="modal-field__value">{{ viewingEnvironment.description || '—' }}</span>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field__label">Web URL</span>
+          <div class="modal-field__value d-flex align-items-start gap-2">
+            <a
+              class="modal-field__value--code text-break modal-url-link"
+              [href]="viewingEnvironment.webBaseUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >{{ viewingEnvironment.webBaseUrl }}</a>
+            <button
+              class="workflows-button versions-btn modal-copy-btn flex-shrink-0"
+              type="button"
+              title="Copy URL"
+              (click)="copyToClipboard(viewingEnvironment.webBaseUrl)"
+            >
+              <i class="bi bi-copy" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+        @if (viewingEnvironment.apiBaseUrl) {
+          <div class="modal-field">
+            <span class="modal-field__label">API URL</span>
+            <div class="modal-field__value d-flex align-items-start gap-2">
+              <a
+                class="modal-field__value--code text-break modal-url-link"
+                [href]="viewingEnvironment.apiBaseUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+              >{{ viewingEnvironment.apiBaseUrl }}</a>
+              <button
+                class="workflows-button versions-btn modal-copy-btn flex-shrink-0"
+                type="button"
+                title="Copy URL"
+                (click)="copyToClipboard(viewingEnvironment.apiBaseUrl)"
+              >
+                <i class="bi bi-copy" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        }
+        <div class="modal-field">
+          <span class="modal-field__label">Created</span>
+          <span class="modal-field__value">{{ formatDateTime(viewingEnvironment.createdAt) }}</span>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field__label">Updated</span>
+          <span class="modal-field__value">{{ formatDateTime(viewingEnvironment.updatedAt) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Create / Edit environment modal ───────────────────────────────────── -->
+@if (isModalOpen) {
+  <div class="version-modal-backdrop" role="dialog" aria-modal="true"
+       (click)="closeModal()" (keydown.escape)="closeModal()" tabindex="-1">
+    <div class="version-modal version-modal--form" (click)="$event.stopPropagation()">
+      <div class="modal-header-area d-flex align-items-center justify-content-between gap-3">
+        <div>
+          <p class="text-eyebrow text--primary mb-1">Environments</p>
+          <h3 class="version-modal__title">{{ editingEnvironment ? 'Edit Environment' : 'New Environment' }}</h3>
+        </div>
+        <button class="version-modal__close" type="button" aria-label="Close" (click)="closeModal()" [disabled]="isSaving">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body-area">
+        @if (error) {
+          <div class="banner-panel banner-panel--error p-3 mb-3">
+            <span>{{ error }}</span>
+          </div>
+        }
+        <form [formGroup]="form" (ngSubmit)="saveEnvironment()" novalidate class="d-grid gap-3">
+          <label class="workflows-field">
+            <span>Name</span>
+            <input
+              type="text"
+              formControlName="name"
+              placeholder="Staging"
+              maxlength="160"
+              [class.workflows-field__control--invalid]="isFieldInvalid('name')"
+            />
+            @if (isFieldInvalid('name')) {
+              <small class="workflows-field__error">
+                @if (form.controls.name.hasError('required')) { Name is required. }
+                @else { Use 160 characters or fewer. }
+              </small>
+            }
+          </label>
+          <label class="workflows-field">
+            <span>Description <span class="env-field-optional">(optional)</span></span>
+            <textarea
+              formControlName="description"
+              placeholder="What is this environment used for?"
+              rows="3"
+              maxlength="500"
+              [class.workflows-field__control--invalid]="isFieldInvalid('description')"
+            ></textarea>
+            @if (isFieldInvalid('description')) {
+              <small class="workflows-field__error">Use 500 characters or fewer.</small>
+            }
+          </label>
+          <label class="workflows-field">
+            <span>Web Base URL</span>
+            <input
+              type="url"
+              formControlName="webBaseUrl"
+              placeholder="https://app.example.com"
+              [class.workflows-field__control--invalid]="isFieldInvalid('webBaseUrl')"
+            />
+            @if (isFieldInvalid('webBaseUrl')) {
+              <small class="workflows-field__error">Enter an absolute HTTP or HTTPS URL.</small>
+            }
+          </label>
+          <label class="workflows-field">
+            <span>API Base URL <span class="env-field-optional">(optional)</span></span>
+            <input
+              type="url"
+              formControlName="apiBaseUrl"
+              placeholder="https://api.example.com"
+              [class.workflows-field__control--invalid]="isFieldInvalid('apiBaseUrl')"
+            />
+            @if (isFieldInvalid('apiBaseUrl')) {
+              <small class="workflows-field__error">Enter an absolute HTTP or HTTPS URL.</small>
+            }
+          </label>
+          <div class="d-flex justify-content-end gap-2">
+            <button class="workflows-button button--primary" type="submit" [disabled]="isSaving">
+              {{ isSaving ? 'Saving...' : editingEnvironment ? 'Save Changes' : 'Create Environment' }}
+            </button>
+            <button class="workflows-button" type="button" (click)="closeModal()" [disabled]="isSaving">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

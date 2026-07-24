@@ -28,7 +28,10 @@ export const apiResponseInterceptor: HttpInterceptorFn = (request, next) => {
     }),
     catchError((error: unknown) => {
       const normalizedError = normalizeApiError(error);
-      notifications.error(normalizedError.message || 'Request failed');
+
+      if (!isAuthRequest(request.url)) {
+        notifications.error(normalizedError.message || 'Request failed');
+      }
 
       return throwError(() => normalizedError);
     }),
@@ -37,6 +40,10 @@ export const apiResponseInterceptor: HttpInterceptorFn = (request, next) => {
 
 function isSpringApiRequest(url: string): boolean {
   return url.startsWith(environment.apiHost) || url.startsWith('/api/');
+}
+
+function isAuthRequest(url: string): boolean {
+  return url.includes('/api/auth/');
 }
 
 function isApiResponse(value: unknown): value is ApiResponse<unknown> {

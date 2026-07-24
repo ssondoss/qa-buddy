@@ -1,0 +1,183 @@
+<section class="d-grid gap-4">
+  <div class="col-12">
+    <section class="surface-panel h-100 p-4">
+
+      <!-- Header -->
+      <header class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+        <div class="d-flex align-items-center gap-2">
+          <p class="text-eyebrow text--primary mb-0">Discovered APIs</p>
+          <span class="wf-count-badge">{{ totalElements }}</span>
+        </div>
+        <button
+          class="workflows-button button--outline-primary"
+          type="button"
+          (click)="loadApis()"
+          [disabled]="isLoading"
+        >
+          <i
+            class="bi bi-arrow-clockwise"
+            [class.toolbar-spin]="isLoading"
+            aria-hidden="true"
+          ></i>
+          {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+        </button>
+      </header>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <label class="workflows-field filter-field">
+          <span>Workflow</span>
+          <select
+            [(ngModel)]="selectedWorkflowId"
+            (ngModelChange)="onWorkflowChange($event)"
+            [disabled]="!workflows.length"
+          >
+            <option value="">All workflows</option>
+            @for (workflow of workflows; track workflow.id) {
+              <option [value]="workflow.id">{{ workflow.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="workflows-field filter-field">
+          <span>Version</span>
+          <select
+            [(ngModel)]="selectedVersionId"
+            (ngModelChange)="onVersionChange($event)"
+            [disabled]="!selectedWorkflowId || !versions.length"
+          >
+            <option value="">All versions</option>
+            @for (version of versions; track version.versionId) {
+              <option [value]="version.versionId">
+                v{{ version.versionNumber }}{{ version.alias ? ' — ' + version.alias : '' }}
+              </option>
+            }
+          </select>
+        </label>
+
+        <label class="workflows-field filter-field">
+          <span>Step</span>
+          <select
+            [(ngModel)]="selectedStepId"
+            (ngModelChange)="onStepChange()"
+            [disabled]="!selectedVersionId || !steps.length"
+          >
+            <option value="">All steps</option>
+            @for (step of steps; track step.id) {
+              <option [value]="step.id">#{{ step.orderIndex }} {{ statusLabel(step.action) }}</option>
+            }
+          </select>
+        </label>
+
+        <div class="filter-clear-wrap">
+          <button
+            class="workflows-button button--outline-primary"
+            type="button"
+            (click)="clearFilters()"
+            [disabled]="!selectedWorkflowId && !selectedVersionId && !selectedStepId"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Error banner -->
+      @if (error) {
+        <div class="banner-panel banner-panel--error p-3 mt-3">
+          <span>{{ error }}</span>
+        </div>
+      }
+
+      <!-- Table -->
+      @if (isLoading) {
+        <div class="empty-state empty-state--panel mt-3">Loading discovered APIs...</div>
+      } @else if (apis.length) {
+        <div class="main-table-wrap border-main mt-3">
+          <table class="table table-sm mb-0 align-middle main-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>URL</th>
+                <th>Status</th>
+                <th>Step</th>
+                <th>Version</th>
+                <th>Workflow</th>
+                <th>Discovered</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (api of apis; track api.id) {
+                <tr>
+                  <td>
+                    <span
+                      class="workflows-pill"
+                      [attr.data-status]="api.method.toLowerCase()"
+                    >
+                      {{ api.method }}
+                    </span>
+                  </td>
+                  <td class="url-cell">
+                    <span class="details-row__value--code" [title]="api.url">{{ api.url }}</span>
+                  </td>
+                  <td>
+                    @if (api.responseStatus != null) {
+                      <span
+                        class="workflows-pill"
+                        [attr.data-status]="api.responseStatus >= 400 ? 'failed' : 'ready'"
+                      >
+                        {{ api.responseStatus }}
+                      </span>
+                    } @else {
+                      <span>—</span>
+                    }
+                  </td>
+                  <td>
+                    <span>#{{ api.stepOrderIndex }} {{ statusLabel(api.stepAction) }}</span>
+                  </td>
+                  <td>
+                    <span>v{{ api.versionNumber }}</span>
+                    @if (api.versionAlias) {
+                      <span class="wf-count-badge ms-1">{{ api.versionAlias }}</span>
+                    }
+                  </td>
+                  <td>{{ api.workflowName }}</td>
+                  <td>{{ formatDateTime(api.discoveredAt) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages > 1) {
+          <div class="pagination-bar mt-3">
+            <button
+              class="pagination-btn"
+              type="button"
+              [disabled]="page === 0"
+              (click)="goToPage(page - 1)"
+              aria-label="Previous page"
+            >
+              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            </button>
+            <span class="pagination-info">{{ page + 1 }} / {{ totalPages }}</span>
+            <button
+              class="pagination-btn"
+              type="button"
+              [disabled]="page >= totalPages - 1"
+              (click)="goToPage(page + 1)"
+              aria-label="Next page"
+            >
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+          </div>
+        }
+      } @else {
+        <div class="empty-state empty-state--panel mt-3">
+          No discovered APIs found. Run API discovery on a ready version to populate this page.
+        </div>
+      }
+
+    </section>
+  </div>
+</section>

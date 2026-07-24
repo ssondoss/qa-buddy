@@ -30,6 +30,10 @@ export class StepService {
     return this.http.delete<null>(`${this.base}/${versionId}/${stepId}`);
   }
 
+  duplicate(versionId: string, stepId: string): Observable<StepView> {
+    return this.http.post<StepView>(`${this.base}/${versionId}/${stepId}/duplicate`, {});
+  }
+
   reorder(versionId: string, payload: StepReorderRequest): Observable<StepView[]> {
     return this.http.patch<StepView[]>(`${this.base}/${versionId}/reorder`, payload);
   }

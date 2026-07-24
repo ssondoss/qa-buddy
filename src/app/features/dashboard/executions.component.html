@@ -1,99 +1,234 @@
-<section class="ops-page">
-  <header class="ops-page__header">
-    <h1>Executions</h1>
+<section class="d-grid gap-4">
+  <div class="col-12">
+    <section class="surface-panel h-100 p-4">
 
-    <div class="ops-page__actions">
-      <select
-        class="ops-select"
-        [value]="selectedWorkflowId"
-        (change)="onWorkflowSelect($event)"
-        [disabled]="isLoadingWorkflows"
-      >
-        @for (workflow of workflows; track workflow.id) {
-          <option [value]="workflow.id">{{ workflow.name }}</option>
-        }
-        @if (!workflows.length) {
-          <option value="">No workflows</option>
-        }
-      </select>
-    </div>
-  </header>
-
-  @if (error) {
-    <div class="ops-banner ops-banner--error">{{ error }}</div>
-  }
-
-  <section class="ops-metrics">
-    @for (metric of metrics; track metric.label) {
-      <article class="ops-panel ops-metric">
-        <span>{{ metric.label }}</span>
-        <strong>{{ metric.value }}</strong>
-      </article>
-    }
-  </section>
-
-  <section class="ops-grid">
-    <section class="ops-panel">
-      <header class="ops-panel__header">
-        <h2>Execution History</h2>
+      <!-- Header -->
+      <header class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+          <p class="text-eyebrow text--primary mb-0">Executions</p>
+          <span class="wf-count-badge">{{ filteredExecutions.length }}</span>
+          @if (runningExecutions.length) {
+            <span class="exec-chip exec-chip--running">
+              <i class="bi bi-arrow-repeat exec-chip__spin" aria-hidden="true"></i>
+              {{ runningExecutions.length }} running
+            </span>
+          }
+          @if (failedCount) {
+            <span class="exec-chip exec-chip--failed">{{ failedCount }} failed</span>
+          }
+          @if (passedCount && avgDuration() !== '—') {
+            <span class="exec-chip">avg {{ avgDuration() }}</span>
+          }
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <button
+            class="workflows-button button--outline-primary"
+            type="button"
+            (click)="refresh()"
+            [disabled]="isLoadingExecutions || !selectedWorkflowId"
+          >
+            <i
+              class="bi bi-arrow-clockwise"
+              [class.toolbar-spin]="isLoadingExecutions"
+              aria-hidden="true"
+            ></i>
+            {{ isLoadingExecutions ? 'Loading...' : 'Refresh' }}
+          </button>
+          @if (refreshMessage) {
+            <span class="exec-refresh-msg">{{ refreshMessage }}</span>
+          }
+        </div>
       </header>
 
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <label class="workflows-field filter-field">
+          <span>Workflow</span>
+          <select
+            [(ngModel)]="selectedWorkflowId"
+            (ngModelChange)="onWorkflowChange($event)"
+            [disabled]="isLoadingWorkflows"
+          >
+            @if (!workflows.length) {
+              <option value="">No workflows</option>
+            }
+            @for (workflow of workflows; track workflow.id) {
+              <option [value]="workflow.id">{{ workflow.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label class="workflows-field filter-field">
+          <span>Version</span>
+          <select
+            [(ngModel)]="selectedVersionId"
+            (ngModelChange)="onVersionChange()"
+            [disabled]="!selectedWorkflowId || !versions.length"
+          >
+            <option value="">All versions</option>
+            @for (v of versions; track v.versionId) {
+              <option [value]="v.versionId">
+                v{{ v.versionNumber }}{{ v.alias ? ' — ' + v.alias : '' }}
+              </option>
+            }
+          </select>
+        </label>
+
+        <div class="filter-clear-wrap">
+          <button
+            class="workflows-button button--outline-primary"
+            type="button"
+            (click)="clearFilters()"
+            [disabled]="!selectedVersionId"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <!-- Error banner -->
+      @if (error) {
+        <div class="banner-panel banner-panel--error p-3 mt-3">
+          <span>{{ error }}</span>
+        </div>
+      }
+
+      <!-- Table -->
       @if (isLoadingExecutions) {
-        <div class="ops-empty">Loading...</div>
+        <div class="empty-state empty-state--panel mt-3">Loading executions...</div>
       } @else if (!selectedWorkflowId) {
-        <div class="ops-empty">Select a workflow.</div>
-      } @else if (!executions.length) {
-        <div class="ops-empty">No executions yet.</div>
+        <div class="empty-state empty-state--panel mt-3">Select a workflow to view executions.</div>
+      } @else if (!filteredExecutions.length) {
+        <div class="empty-state empty-state--panel mt-3">
+          {{ executions.length ? 'No executions for this version.' : 'No executions yet. Run a version to see results here.' }}
+        </div>
       } @else {
-        <div class="ops-table-wrap">
-          <table class="ops-table">
+        <div class="main-table-wrap border-main mt-3">
+          <table class="table table-sm mb-0 align-middle main-table">
             <thead>
               <tr>
+                <th class="exec-col-chevron"></th>
                 <th>ID</th>
                 <th>Version</th>
                 <th>Environment</th>
                 <th>Status</th>
+                <th>Steps</th>
                 <th>Duration</th>
                 <th>Started</th>
               </tr>
             </thead>
             <tbody>
-              @for (execution of executions; track execution.id) {
-                <tr>
-                  <td>
-                    <code>{{ shortId(execution.id) }}</code>
+              @for (execution of pagedExecutions; track execution.id) {
+                <tr
+                  class="exec-row main-table-row"
+                  [class.exec-row--expanded]="expandedExecutionId === execution.id"
+                  (click)="toggleExecution(execution.id)"
+                >
+                  <td class="exec-col-chevron">
+                    <i
+                      class="bi"
+                      [class.bi-chevron-right]="expandedExecutionId !== execution.id"
+                      [class.bi-chevron-down]="expandedExecutionId === execution.id"
+                      aria-hidden="true"
+                    ></i>
                   </td>
-                  <td>v{{ execution.versionNumber }}</td>
+                  <td>
+                    <span class="details-row__value--code">{{ shortId(execution.id) }}</span>
+                  </td>
+                  <td>
+                    <span>v{{ execution.versionNumber }}</span>
+                  </td>
                   <td>{{ execution.environmentNameSnapshot || '—' }}</td>
                   <td>
-                    <span class="status-pill" [attr.data-status]="statusToken(execution.status)">
+                    <span
+                      class="workflows-pill"
+                      [attr.data-status]="statusToken(execution.status)"
+                    >
                       {{ statusLabel(execution.status) }}
                     </span>
+                  </td>
+                  <td>
+                    <span class="wf-count-badge">{{ execution.stepResults.length }}</span>
                   </td>
                   <td>{{ formatDuration(execution.startedAt, execution.finishedAt) }}</td>
                   <td>{{ formatDateTime(execution.startedAt) }}</td>
                 </tr>
+
+                @if (expandedExecutionId === execution.id) {
+                  <tr class="exec-steps-row">
+                    <td colspan="8">
+                      @if (execution.stepResults.length) {
+                        <div class="exec-steps">
+                          @for (step of execution.stepResults; track step.stepId) {
+                            <div
+                              class="exec-step-item"
+                              [class.exec-step-item--failed]="step.status === 'FAILED'"
+                            >
+                              <span class="wf-count-badge flex-shrink-0">{{ step.orderIndex }}</span>
+                              <span
+                                class="workflows-pill flex-shrink-0"
+                                [attr.data-status]="statusToken(step.status)"
+                              >
+                                {{ statusLabel(step.status) }}
+                              </span>
+                              <span class="exec-step-action details-row__value--code flex-shrink-0">
+                                {{ statusLabel(stepSnapshot(step, 'action')) || '—' }}
+                              </span>
+                              @if (stepSnapshot(step, 'selector')) {
+                                <span class="exec-step-detail details-row__value--code">
+                                  {{ stepSnapshot(step, 'selector') }}
+                                </span>
+                              } @else if (stepSnapshot(step, 'value')) {
+                                <span class="exec-step-detail details-row__value--code">
+                                  {{ stepSnapshot(step, 'value') }}
+                                </span>
+                              }
+                              @if (step.durationMs != null) {
+                                <span class="exec-step-duration flex-shrink-0">{{ step.durationMs }}ms</span>
+                              }
+                              @if (step.errorMessage) {
+                                <span class="exec-step-error">{{ step.errorMessage }}</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      } @else {
+                        <div class="exec-steps-empty">No step results recorded.</div>
+                      }
+                    </td>
+                  </tr>
+                }
               }
             </tbody>
           </table>
         </div>
-      }
-    </section>
 
-    <aside class="ops-panel ops-side">
-      <h2>Running</h2>
-
-      @if (runningExecutions.length) {
-        @for (execution of runningExecutions; track execution.id) {
-          <article class="ops-side__item">
-            <strong>v{{ execution.versionNumber }}</strong>
-            <span>{{ execution.environmentNameSnapshot || '—' }}</span>
-            <span>{{ formatDateTime(execution.startedAt) }}</span>
-          </article>
+        <!-- Pagination -->
+        @if (totalPages > 1) {
+          <div class="pagination-bar mt-3">
+            <button
+              class="pagination-btn"
+              type="button"
+              [disabled]="page === 0"
+              (click)="goToPage(page - 1)"
+              aria-label="Previous page"
+            >
+              <i class="bi bi-chevron-left" aria-hidden="true"></i>
+            </button>
+            <span class="pagination-info">{{ page + 1 }} / {{ totalPages }}</span>
+            <button
+              class="pagination-btn"
+              type="button"
+              [disabled]="page >= totalPages - 1"
+              (click)="goToPage(page + 1)"
+              aria-label="Next page"
+            >
+              <i class="bi bi-chevron-right" aria-hidden="true"></i>
+            </button>
+          </div>
         }
-      } @else {
-        <p class="ops-side__empty">None running.</p>
       }
-    </aside>
-  </section>
+
+    </section>
+  </div>
 </section>

@@ -20,17 +20,11 @@
             <button
               class="workflows-button button--outline-primary"
               type="button"
-              [class.workflows-button--active]="showCapturePanel"
-              [title]="showCapturePanel ? 'Hide the recorder panel' : 'Open the recorder to capture a new version'"
-              (click)="toggleCapturePanel()"
+              title="Open the recorder to capture a new version"
+              (click)="openRecordingModal()"
             >
-              <i
-                class="bi"
-                [class.bi-record-circle]="!showCapturePanel"
-                [class.bi-x-circle]="showCapturePanel"
-                aria-hidden="true"
-              ></i>
-              {{ showCapturePanel ? 'Hide Recorder' : 'Record' }}
+              <i class="bi bi-record-circle" aria-hidden="true"></i>
+              Record
             </button>
             <button
               class="workflows-button button--outline-primary"
@@ -65,154 +59,6 @@
             </div>
           </div>
         </header>
-
-        <!-- ── New workflow form ────────────────────────────────────────── -->
-        @if (showWorkflowForm) {
-          <div class="my-4 py-4 border-y-soft">
-            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-              <p class="text-eyebrow text--muted mb-0">New workflow</p>
-            </div>
-            <form
-              class="row g-3 align-items-start"
-              [formGroup]="workflowForm"
-              (ngSubmit)="createWorkflow()"
-              novalidate
-            >
-              <label class="workflows-field col-12 col-lg-4">
-                <span>Name</span>
-                <input
-                  type="text"
-                  formControlName="name"
-                  placeholder="Checkout regression"
-                  maxlength="160"
-                  [class.workflows-field__control--invalid]="isWorkflowFieldInvalid('name')"
-                />
-                @if (isWorkflowFieldInvalid('name')) {
-                  <small class="workflows-field__error">
-                    @if (workflowForm.controls.name.hasError('required')) {
-                      Workflow name is required.
-                    } @else {
-                      Use 160 characters or fewer.
-                    }
-                  </small>
-                }
-              </label>
-
-              <label class="workflows-field col-12 col-lg-8">
-                <span>Description</span>
-                <textarea
-                  formControlName="description"
-                  placeholder="What this recording should cover"
-                  maxlength="2000"
-                  [class.workflows-field__control--invalid]="isWorkflowFieldInvalid('description')"
-                ></textarea>
-                @if (isWorkflowFieldInvalid('description')) {
-                  <small class="workflows-field__error">Use 2000 characters or fewer.</small>
-                }
-              </label>
-
-              <div class="col-12 d-flex justify-content-end gap-2 flex-wrap">
-                <button
-                  class="workflows-button button--primary"
-                  type="submit"
-                  [disabled]="isCreatingWorkflow"
-                >
-                  {{ isCreatingWorkflow ? 'Creating...' : 'Create Workflow' }}
-                </button>
-                <button
-                  class="workflows-button"
-                  type="button"
-                  (click)="closeCreateWorkflow()"
-                  [disabled]="isCreatingWorkflow"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        }
-
-        <!-- ── Recording form ───────────────────────────────────────────── -->
-        @if (showCapturePanel) {
-          <div class="mt-4 pt-4 border-t-soft">
-            <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-              <p class="text-eyebrow text--muted mb-0">Recorder</p>
-              <span
-                class="workflows-pill"
-                [attr.data-status]="phase === 'recording' ? 'recording' : 'idle'"
-              >
-                {{ phase === 'recording' ? 'Recording' : 'Ready' }}
-              </span>
-            </div>
-            <form
-              class="row g-3 align-items-end"
-              [formGroup]="recordingForm"
-              (ngSubmit)="startRecording()"
-              novalidate
-            >
-              <label class="workflows-field col-12 col-md-6 col-xl-3">
-                <span>Workflow</span>
-                <select
-                  [value]="selectedWorkflowId"
-                  (change)="selectWorkflowFromEvent($event)"
-                  [disabled]="phase !== 'idle'"
-                >
-                  @for (workflow of workflows; track workflow.id) {
-                    <option [value]="workflow.id">{{ workflow.name }}</option>
-                  }
-                </select>
-              </label>
-
-              <label class="workflows-field col-12 col-md-6 col-xl-3">
-                <span>Environment</span>
-                <select
-                  formControlName="environmentId"
-                  [disabled]="phase !== 'idle' || isLoadingEnvironments"
-                  [class.workflows-field__control--invalid]="isRecordingFieldInvalid('environmentId')"
-                >
-                  <option value="">Select environment</option>
-                  @for (environment of recordingEnvironments; track environment.id) {
-                    <option [value]="environment.id">{{ environment.name }}</option>
-                  }
-                </select>
-                @if (isRecordingFieldInvalid('environmentId')) {
-                  <small class="workflows-field__error">Environment is required.</small>
-                }
-              </label>
-
-              <label class="workflows-field col-12 col-lg-8 col-xl-4">
-                <span>Start Path</span>
-                <input
-                  type="text"
-                  formControlName="startPath"
-                  placeholder="/login"
-                  maxlength="1000"
-                  [disabled]="phase !== 'idle'"
-                  [class.workflows-field__control--invalid]="isRecordingFieldInvalid('startPath')"
-                />
-                @if (isRecordingFieldInvalid('startPath')) {
-                  <small class="workflows-field__error">
-                    @if (recordingForm.controls.startPath.hasError('maxlength')) {
-                      Use 1000 characters or fewer.
-                    } @else {
-                      Use a relative path, not a full URL.
-                    }
-                  </small>
-                }
-              </label>
-
-              <div class="col-12 col-lg-4 col-xl-2 d-grid">
-                <button
-                  class="workflows-button button--primary"
-                  type="submit"
-                  [disabled]="phase !== 'idle' || !selectedWorkflow || recordingForm.invalid"
-                >
-                  {{ phase === 'recording' ? 'Recording...' : 'Start Recording' }}
-                </button>
-              </div>
-            </form>
-          </div>
-        }
 
         <!-- ── Banners ───────────────────────────────────────────────────── -->
         @if (error) {
@@ -283,53 +129,41 @@
                         <span>{{ formatDateTime(workflow.updatedAt) }}</span>
                       </td>
                       <td (click)="$event.stopPropagation()">
-                        @if (confirmingDeleteWorkflowId === workflow.id) {
-                          <div class="d-flex align-items-center gap-1">
-                            <span class="delete-confirm-text">Sure?</span>
-                            <button
-                              class="workflows-button versions-btn step-btn--danger"
-                              type="button"
-                              [disabled]="isDeletingWorkflow"
-                              (click)="confirmDeleteWorkflow(workflow.id)"
-                            >
-                              @if (isDeletingWorkflow) {
-                                <i class="bi bi-arrow-repeat versions-spin" aria-hidden="true"></i>
-                              } @else {
-                                Yes
-                              }
-                            </button>
+                        <div class="d-flex align-items-center gap-1">
+                          <div class="version-execute-wrap">
                             <button
                               class="workflows-button versions-btn"
                               type="button"
-                              (click)="cancelDeleteWorkflow()"
-                            >No</button>
+                              (click)="openWorkflowModal(workflow)"
+                              aria-label="View workflow details"
+                            >
+                              <i class="bi bi-info-circle" aria-hidden="true"></i>
+                            </button>
+                            <span class="version-tooltip">View workflow details</span>
                           </div>
-                        } @else {
-                          <div class="d-flex align-items-center gap-1">
-                            <div class="version-execute-wrap">
-                              <button
-                                class="workflows-button versions-btn"
-                                type="button"
-                                (click)="openWorkflowModal(workflow)"
-                                aria-label="View workflow details"
-                              >
-                                <i class="bi bi-info-circle" aria-hidden="true"></i>
-                              </button>
-                              <span class="version-tooltip">View workflow details</span>
-                            </div>
-                            <div class="version-execute-wrap">
-                              <button
-                                class="workflows-button versions-btn step-btn--danger"
-                                type="button"
-                                (click)="requestDeleteWorkflow($event, workflow.id)"
-                                aria-label="Delete workflow"
-                              >
-                                <i class="bi bi-trash" aria-hidden="true"></i>
-                              </button>
-                              <span class="version-tooltip">Delete workflow</span>
-                            </div>
+                          <div class="version-execute-wrap">
+                            <button
+                              class="workflows-button versions-btn"
+                              type="button"
+                              (click)="openDuplicateWorkflow(workflow)"
+                              aria-label="Duplicate workflow"
+                            >
+                              <i class="bi bi-files" aria-hidden="true"></i>
+                            </button>
+                            <span class="version-tooltip">Duplicate workflow</span>
                           </div>
-                        }
+                          <div class="version-execute-wrap">
+                            <button
+                              class="workflows-button versions-btn step-btn--danger"
+                              type="button"
+                              (click)="requestDeleteWorkflow($event, workflow)"
+                              aria-label="Delete workflow"
+                            >
+                              <i class="bi bi-trash" aria-hidden="true"></i>
+                            </button>
+                            <span class="version-tooltip">Delete workflow</span>
+                          </div>
+                        </div>
                       </td>
                     </tr>
 
@@ -350,9 +184,11 @@
                                 <!-- Version list header -->
                                 <div class="version-list__header">
                                   <span>Version</span>
+                                  <span>Alias</span>
                                   <span>Status</span>
                                   <span>Environment</span>
                                   <span>Date</span>
+                                  <span>Runs</span>
                                   <span class="version-list__header-action">Actions</span>
                                 </div>
 
@@ -376,6 +212,47 @@
                                         </span>
                                         v{{ version.versionNumber }}
                                       </span>
+                                      <span class="version-item__alias" (click)="$event.stopPropagation()">
+                                        @if (editingAliasVersionId === version.versionId) {
+                                          <span class="d-flex align-items-center gap-1">
+                                            <input
+                                              class="wf-alias-input"
+                                              type="text"
+                                              [value]="aliasInputValue"
+                                              (input)="aliasInputValue = $any($event.target).value"
+                                              (keydown.enter)="saveAlias(workflow.id, version)"
+                                              (keydown.escape)="cancelAliasEditor()"
+                                              maxlength="100"
+                                              placeholder="e.g. baseline"
+                                              autofocus
+                                            />
+                                            <button
+                                              class="workflows-button versions-btn button--primary"
+                                              type="button"
+                                              [disabled]="isSavingAlias"
+                                              (click)="saveAlias(workflow.id, version)"
+                                            >{{ isSavingAlias ? '...' : 'Save' }}</button>
+                                            <button
+                                              class="workflows-button versions-btn"
+                                              type="button"
+                                              (click)="cancelAliasEditor()"
+                                            >Cancel</button>
+                                          </span>
+                                        } @else {
+                                          <button
+                                            class="wf-alias-edit-btn"
+                                            type="button"
+                                            (click)="openAliasEditor($event, version)"
+                                            [title]="version.alias ? 'Edit alias' : 'Add alias'"
+                                          >
+                                            @if (version.alias) {
+                                              <span class="wf-alias-badge">{{ version.alias }}</span>
+                                            } @else {
+                                              <span class="wf-alias-placeholder">+ alias</span>
+                                            }
+                                          </button>
+                                        }
+                                      </span>
                                       <span class="version-item__status">
                                         <span class="workflows-pill" [attr.data-status]="statusToken(version.status)">
                                           {{ statusLabel(version.status) }}
@@ -383,6 +260,19 @@
                                       </span>
                                       <span class="version-item__env">{{ version.environmentNameSnapshot || '—' }}</span>
                                       <span class="version-item__date">{{ formatDateTime(version.createdAt) }}</span>
+                                      <span class="version-item__execs" (click)="$event.stopPropagation()">
+                                        @if (version.executionsCount > 0) {
+                                          <button
+                                            class="step-api-badge"
+                                            type="button"
+                                            title="{{ version.executionsCount }} execution{{ version.executionsCount === 1 ? '' : 's' }} — click to view"
+                                            (click)="navigateToVersionExecutions(workflow.id, version.versionId)"
+                                          >
+                                            <i class="bi bi-play-fill" aria-hidden="true"></i>
+                                            {{ version.executionsCount }}
+                                          </button>
+                                        }
+                                      </span>
                                       <div class="version-item__actions" (click)="$event.stopPropagation()">
                                         @if (confirmingDeleteVersionId === version.versionId) {
                                           <span class="delete-confirm-text">Sure?</span>
@@ -417,10 +307,37 @@
                                           </div>
                                           <div class="version-execute-wrap">
                                             <button
+                                              class="workflows-button versions-btn"
+                                              type="button"
+                                              [disabled]="duplicatingVersionId === version.versionId || version.status === 'RECORDING'"
+                                              (click)="duplicateVersion($event, workflow.id, version)"
+                                              [attr.aria-label]="'Duplicate v' + version.versionNumber"
+                                            >
+                                              @if (duplicatingVersionId === version.versionId) {
+                                                <i class="bi bi-arrow-repeat versions-spin" aria-hidden="true"></i>
+                                              } @else {
+                                                <i class="bi bi-files" aria-hidden="true"></i>
+                                              }
+                                            </button>
+                                            <span class="version-tooltip">Duplicate v{{ version.versionNumber }}</span>
+                                          </div>
+                                          <div class="version-execute-wrap">
+                                            <button
+                                              class="workflows-button versions-btn"
+                                              type="button"
+                                              (click)="navigateToVersionExecutions(workflow.id, version.versionId)"
+                                              [attr.aria-label]="'View executions for v' + version.versionNumber"
+                                            >
+                                              <i class="bi bi-clock-history" aria-hidden="true"></i>
+                                            </button>
+                                            <span class="version-tooltip">View executions for v{{ version.versionNumber }}</span>
+                                          </div>
+                                          <div class="version-execute-wrap">
+                                            <button
                                               class="workflows-button button--outline-primary versions-btn"
                                               type="button"
                                               [disabled]="version.status !== 'READY' || !!discoveringVersionId"
-                                              (click)="discoverApis(workflow.id, version)"
+                                              (click)="openDiscoveryPicker(workflow.id, version)"
                                               [attr.aria-label]="'Discover APIs for v' + version.versionNumber"
                                             >
                                               @if (discoveringVersionId === version.versionId) {
@@ -502,99 +419,6 @@
                                         } @else {
                                           <div class="steps-list">
 
-                                            <!-- Add step form — shown above the list -->
-                                            @if (isAddingStep) {
-                                              <div class="surface-tile p-3 steps-list__add-form">
-                                                <p class="text-eyebrow text--muted mb-3">New Step</p>
-                                                <ng-container [ngTemplateOutlet]="stepFormTpl"></ng-container>
-
-                                                @if (stepForm.action === 'ASSERT_API' && discoveryVersionId === stepsVersionId) {
-                                                  @if (discoveryResults.some(r => r.apis.length > 0)) {
-                                                    <div class="mt-3">
-                                                      <p class="text-eyebrow text--muted mb-2">Or pick from discovered APIs</p>
-                                                      <div class="d-grid gap-1">
-                                                        @for (result of discoveryResults; track result.stepId) {
-                                                          @for (api of result.apis; track api.id) {
-                                                            <div
-                                                              class="assertion-api-option"
-                                                              [class.assertion-api-option--active]="isApiSelected(api.id)"
-                                                            >
-                                                              <div class="assertion-api-option__header" (click)="toggleApiSelection(api)">
-                                                                <input
-                                                                  type="checkbox"
-                                                                  [checked]="isApiSelected(api.id)"
-                                                                  (click)="$event.stopPropagation()"
-                                                                  (change)="toggleApiSelection(api)"
-                                                                />
-                                                                <span class="workflows-pill" [attr.data-status]="api.method.toLowerCase()">{{ api.method }}</span>
-                                                                <span class="details-row__value--code assertion-api-option__url">{{ api.url }}</span>
-                                                                <span
-                                                                  class="workflows-pill"
-                                                                  [attr.data-status]="api.responseStatus && api.responseStatus >= 400 ? 'failed' : 'ready'"
-                                                                >
-                                                                  {{ api.responseStatus ?? '?' }}
-                                                                </span>
-                                                              </div>
-                                                              @if (isApiSelected(api.id)) {
-                                                                <div class="assertion-api-option__body row g-2">
-                                                                  <div class="col-12 col-md-4">
-                                                                    <label class="workflows-field">
-                                                                      <span>Expected Status</span>
-                                                                      <input
-                                                                        type="number"
-                                                                        [value]="getAssertionConfig(api.id)?.expectedStatus ?? ''"
-                                                                        (input)="updateAssertionStatus(api.id, $any($event.target).value)"
-                                                                        placeholder="200"
-                                                                      />
-                                                                    </label>
-                                                                  </div>
-                                                                  <div class="col-12 col-md-8">
-                                                                    <label class="workflows-field">
-                                                                      <span>Body Contains (optional)</span>
-                                                                      <input
-                                                                        type="text"
-                                                                        [value]="getAssertionConfig(api.id)?.expectedBodyContains ?? ''"
-                                                                        (input)="updateAssertionBody(api.id, $any($event.target).value)"
-                                                                        placeholder="e.g. success"
-                                                                      />
-                                                                    </label>
-                                                                  </div>
-                                                                </div>
-                                                              }
-                                                            </div>
-                                                          }
-                                                        }
-                                                      </div>
-                                                    </div>
-                                                  }
-                                                }
-
-                                                <div class="d-flex gap-2 mt-3">
-                                                  <button
-                                                    class="workflows-button button--primary versions-btn"
-                                                    type="button"
-                                                    [disabled]="isSavingStep"
-                                                    (click)="saveNewStep(stepsVersionId!)"
-                                                  >
-                                                    @if (isSavingStep) {
-                                                      Saving...
-                                                    } @else if (stepForm.action === 'ASSERT_API' && assertionSelections.size > 0) {
-                                                      Save {{ assertionSelections.size }} Assertion{{ assertionSelections.size > 1 ? 's' : '' }}
-                                                    } @else {
-                                                      Add Step
-                                                    }
-                                                  </button>
-                                                  <button
-                                                    class="workflows-button versions-btn"
-                                                    type="button"
-                                                    (click)="closeAddStep()"
-                                                  >
-                                                    Cancel
-                                                  </button>
-                                                </div>
-                                              </div>
-                                            }
-
                                             @for (step of pagedSteps; track step.id) {
                                               <div
                                                 class="step-item surface-tile"
@@ -624,6 +448,28 @@
                                                       {{ statusLabel(step.action) }}
                                                     </span>
                                                     <span class="step-item__summary details-row__value--code">{{ stepSummary(step) }}</span>
+                                                    @if (discoveredApisForStep(step.id).length > 0) {
+                                                      <button
+                                                        class="step-api-badge flex-shrink-0"
+                                                        type="button"
+                                                        title="{{ discoveredApisForStep(step.id).length }} API{{ discoveredApisForStep(step.id).length === 1 ? '' : 's' }} discovered — click to view"
+                                                        (click)="$event.stopPropagation(); navigateToStepApis(step.id)"
+                                                      >
+                                                        <i class="bi bi-plug-fill" aria-hidden="true"></i>
+                                                        {{ discoveredApisForStep(step.id).length }}
+                                                      </button>
+                                                    }
+                                                    @if (stepExecutionCount(step.id) > 0) {
+                                                      <button
+                                                        class="step-api-badge step-exec-badge flex-shrink-0"
+                                                        type="button"
+                                                        title="{{ stepExecutionCount(step.id) }} execution run{{ stepExecutionCount(step.id) === 1 ? '' : 's' }} — click to view"
+                                                        (click)="$event.stopPropagation(); navigateToVersionExecutions(selectedWorkflowId, stepsVersionId!)"
+                                                      >
+                                                        <i class="bi bi-play-fill" aria-hidden="true"></i>
+                                                        {{ stepExecutionCount(step.id) }}
+                                                      </button>
+                                                    }
                                                   </div>
                                                   <div class="step-item__controls">
                                                     <div class="version-execute-wrap">
@@ -643,17 +489,51 @@
                                                         class="workflows-button versions-btn"
                                                         type="button"
                                                         [disabled]="!!deletingStepId"
-                                                        (click)="editingStepId === step.id ? closeEditStep() : openEditStep(step)"
+                                                        (click)="openEditStep(step)"
+                                                        aria-label="Edit step"
                                                       >
-                                                        <i
-                                                          class="bi"
-                                                          [class.bi-pencil]="editingStepId !== step.id"
-                                                          [class.bi-x]="editingStepId === step.id"
-                                                          aria-hidden="true"
-                                                        ></i>
-                                                        {{ editingStepId === step.id ? 'Cancel' : 'Edit' }}
+                                                        <i class="bi bi-pencil" aria-hidden="true"></i>
+                                                        Edit
                                                       </button>
-                                                      <span class="version-tooltip">{{ editingStepId === step.id ? 'Cancel editing' : 'Edit this step' }}</span>
+                                                      <span class="version-tooltip">Edit this step</span>
+                                                    </div>
+                                                    <div class="version-execute-wrap">
+                                                      <button
+                                                        class="workflows-button versions-btn"
+                                                        type="button"
+                                                        [disabled]="!!duplicatingStepId || isSavingStep || !!deletingStepId"
+                                                        (click)="duplicateStep(stepsVersionId!, step)"
+                                                        aria-label="Duplicate step"
+                                                      >
+                                                        @if (duplicatingStepId === step.id) {
+                                                          <i class="bi bi-arrow-repeat versions-spin" aria-hidden="true"></i>
+                                                        } @else {
+                                                          <i class="bi bi-files" aria-hidden="true"></i>
+                                                        }
+                                                      </button>
+                                                      <span class="version-tooltip">Duplicate step</span>
+                                                    </div>
+                                                    <div class="version-execute-wrap">
+                                                      <button
+                                                        class="workflows-button button--primary versions-btn versions-btn--execute"
+                                                        type="button"
+                                                        [disabled]="version.status !== 'READY' || !!executingVersionId || !!deletingStepId"
+                                                        (click)="executeVersion(workflow.id, version)"
+                                                        [attr.aria-label]="'Execute v' + version.versionNumber"
+                                                      >
+                                                        @if (executingVersionId === version.versionId) {
+                                                          <i class="bi bi-arrow-repeat versions-spin" aria-hidden="true"></i>
+                                                        } @else {
+                                                          <i class="bi bi-play-fill" aria-hidden="true"></i>
+                                                        }
+                                                      </button>
+                                                      <span class="version-tooltip">
+                                                        @if (version.status === 'READY') {
+                                                          Execute v{{ version.versionNumber }}
+                                                        } @else {
+                                                          Only Ready versions can be executed
+                                                        }
+                                                      </span>
                                                     </div>
                                                     @if (confirmingDeleteStepId === step.id) {
                                                       <span class="delete-confirm-text">Sure?</span>
@@ -691,28 +571,6 @@
                                                   </div>
                                                 </div>
 
-                                                @if (editingStepId === step.id) {
-                                                  <div class="step-item__form mt-3 pt-3 border-t-soft">
-                                                    <ng-container [ngTemplateOutlet]="stepFormTpl"></ng-container>
-                                                    <div class="d-flex gap-2 mt-3">
-                                                      <button
-                                                        class="workflows-button button--primary versions-btn"
-                                                        type="button"
-                                                        [disabled]="isSavingStep"
-                                                        (click)="saveEditStep(stepsVersionId!)"
-                                                      >
-                                                        {{ isSavingStep ? 'Saving...' : 'Save' }}
-                                                      </button>
-                                                      <button
-                                                        class="workflows-button versions-btn"
-                                                        type="button"
-                                                        (click)="closeEditStep()"
-                                                      >
-                                                        Cancel
-                                                      </button>
-                                                    </div>
-                                                  </div>
-                                                }
                                               </div>
                                             }
 
@@ -822,8 +680,277 @@
   </section>
 </section>
 
+<!-- ── New workflow modal ────────────────────────────────────────────────── -->
+@if (showWorkflowForm) {
+  <div class="version-modal-backdrop" role="dialog" aria-modal="true"
+       (click)="closeCreateWorkflow()" (keydown.escape)="closeCreateWorkflow()" tabindex="-1">
+    <div class="version-modal version-modal--form" (click)="$event.stopPropagation()">
+      <div class="modal-header-area d-flex align-items-center justify-content-between gap-3">
+        <div>
+          <p class="text-eyebrow text--primary mb-1">Workflows</p>
+          <h3 class="version-modal__title">New Workflow</h3>
+        </div>
+        <button class="version-modal__close" type="button" aria-label="Close" (click)="closeCreateWorkflow()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body-area">
+        <form [formGroup]="workflowForm" (ngSubmit)="createWorkflow()" novalidate class="d-grid gap-3">
+          <label class="workflows-field">
+            <span>Name</span>
+            <input
+              type="text"
+              formControlName="name"
+              placeholder="Checkout regression"
+              maxlength="160"
+              [class.workflows-field__control--invalid]="isWorkflowFieldInvalid('name')"
+            />
+            @if (isWorkflowFieldInvalid('name')) {
+              <small class="workflows-field__error">
+                @if (workflowForm.controls.name.hasError('required')) { Workflow name is required. }
+                @else { Use 160 characters or fewer. }
+              </small>
+            }
+          </label>
+          <label class="workflows-field">
+            <span>Description</span>
+            <textarea
+              formControlName="description"
+              placeholder="What this recording should cover"
+              maxlength="2000"
+              [class.workflows-field__control--invalid]="isWorkflowFieldInvalid('description')"
+            ></textarea>
+            @if (isWorkflowFieldInvalid('description')) {
+              <small class="workflows-field__error">Use 2000 characters or fewer.</small>
+            }
+          </label>
+          <div class="d-flex justify-content-end gap-2">
+            <button class="workflows-button button--primary" type="submit" [disabled]="isCreatingWorkflow">
+              {{ isCreatingWorkflow ? 'Creating...' : 'Create Workflow' }}
+            </button>
+            <button class="workflows-button" type="button" (click)="closeCreateWorkflow()" [disabled]="isCreatingWorkflow">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Recording modal ───────────────────────────────────────────────────── -->
+@if (showCapturePanel) {
+  <div class="version-modal-backdrop" role="dialog" aria-modal="true"
+       (click)="phase === 'idle' && closeRecordingModal()" (keydown.escape)="phase === 'idle' && closeRecordingModal()" tabindex="-1">
+    <div class="version-modal version-modal--wide" (click)="$event.stopPropagation()">
+      <div class="modal-header-area d-flex align-items-center justify-content-between gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div>
+            <p class="text-eyebrow text--primary mb-1">New Version</p>
+            <h3 class="version-modal__title">Record</h3>
+          </div>
+          <span class="workflows-pill" [attr.data-status]="phase === 'recording' ? 'recording' : 'idle'">
+            {{ phase === 'recording' ? 'Recording...' : 'Ready' }}
+          </span>
+        </div>
+        <button class="version-modal__close" type="button" aria-label="Close" [disabled]="phase !== 'idle'" (click)="closeRecordingModal()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body-area">
+        <form [formGroup]="recordingForm" (ngSubmit)="startRecording()" novalidate class="d-grid gap-3">
+          <label class="workflows-field">
+            <span>Workflow</span>
+            <select [value]="selectedWorkflowId" (change)="selectWorkflowFromEvent($event)" [disabled]="phase !== 'idle'">
+              @for (workflow of workflows; track workflow.id) {
+                <option [value]="workflow.id">{{ workflow.name }}</option>
+              }
+            </select>
+          </label>
+          <label class="workflows-field">
+            <span>Environment</span>
+            <select
+              formControlName="environmentId"
+              [disabled]="phase !== 'idle' || isLoadingEnvironments"
+              [class.workflows-field__control--invalid]="isRecordingFieldInvalid('environmentId')"
+            >
+              <option value="">Select environment</option>
+              @for (environment of recordingEnvironments; track environment.id) {
+                <option [value]="environment.id">{{ environment.name }}</option>
+              }
+            </select>
+            @if (isRecordingFieldInvalid('environmentId')) {
+              <small class="workflows-field__error">Environment is required.</small>
+            }
+          </label>
+          <label class="workflows-field">
+            <span>Start Path</span>
+            <input
+              type="text"
+              formControlName="startPath"
+              placeholder="/login"
+              maxlength="1000"
+              [disabled]="phase !== 'idle'"
+              [class.workflows-field__control--invalid]="isRecordingFieldInvalid('startPath')"
+            />
+            @if (isRecordingFieldInvalid('startPath')) {
+              <small class="workflows-field__error">
+                @if (recordingForm.controls.startPath.hasError('maxlength')) { Use 1000 characters or fewer. }
+                @else { Use a relative path, not a full URL. }
+              </small>
+            }
+          </label>
+          <label class="workflows-field">
+            <span>Alias <span style="text-transform:none;font-weight:500;letter-spacing:0;opacity:.65">(optional)</span></span>
+            <input
+              type="text"
+              formControlName="alias"
+              placeholder="e.g. baseline"
+              maxlength="100"
+              [disabled]="phase !== 'idle'"
+              [class.workflows-field__control--invalid]="isRecordingFieldInvalid('alias')"
+            />
+            @if (isRecordingFieldInvalid('alias')) {
+              <small class="workflows-field__error">Use 100 characters or fewer.</small>
+            }
+          </label>
+          <div class="d-flex justify-content-end gap-2">
+            <button
+              class="workflows-button button--primary"
+              type="submit"
+              [disabled]="phase !== 'idle' || !selectedWorkflow || recordingForm.invalid"
+            >
+              {{ phase === 'recording' ? 'Recording...' : 'Start Recording' }}
+            </button>
+            <button class="workflows-button" type="button" [disabled]="phase !== 'idle'" (click)="closeRecordingModal()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Add step modal ────────────────────────────────────────────────────── -->
+@if (isAddingStep) {
+  <div class="version-modal-backdrop" role="dialog" aria-modal="true"
+       (click)="closeAddStep()" (keydown.escape)="closeAddStep()" tabindex="-1">
+    <div class="version-modal version-modal--wide" (click)="$event.stopPropagation()">
+      <div class="modal-header-area d-flex align-items-center justify-content-between gap-3">
+        <div>
+          <p class="text-eyebrow text--primary mb-1">Steps</p>
+          <h3 class="version-modal__title">New Step</h3>
+        </div>
+        <button class="version-modal__close" type="button" aria-label="Close" (click)="closeAddStep()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body-area">
+        <ng-container [ngTemplateOutlet]="stepFormTpl"></ng-container>
+
+        @if (stepForm.action === 'ASSERT_API' && discoveryVersionId === stepsVersionId) {
+          @if (discoveryResults.some(r => r.apis.length > 0)) {
+            <div class="mt-3">
+              <p class="text-eyebrow text--primary mb-2">Or pick from discovered APIs</p>
+              <div class="d-grid gap-1">
+                @for (result of discoveryResults; track result.stepId) {
+                  @for (api of result.apis; track api.id) {
+                    <div class="assertion-api-option" [class.assertion-api-option--active]="isApiSelected(api.id)">
+                      <div class="assertion-api-option__header" (click)="toggleApiSelection(api)">
+                        <input type="checkbox" [checked]="isApiSelected(api.id)" (click)="$event.stopPropagation()" (change)="toggleApiSelection(api)" />
+                        <span class="workflows-pill" [attr.data-status]="api.method.toLowerCase()">{{ api.method }}</span>
+                        <span class="details-row__value--code assertion-api-option__url">{{ api.url }}</span>
+                        <span class="workflows-pill" [attr.data-status]="api.responseStatus && api.responseStatus >= 400 ? 'failed' : 'ready'">
+                          {{ api.responseStatus ?? '?' }}
+                        </span>
+                      </div>
+                      @if (isApiSelected(api.id)) {
+                        <div class="assertion-api-option__body row g-2">
+                          <div class="col-12 col-md-4">
+                            <label class="workflows-field">
+                              <span>Expected Status</span>
+                              <input type="number" [value]="getAssertionConfig(api.id)?.expectedStatus ?? ''" (input)="updateAssertionStatus(api.id, $any($event.target).value)" placeholder="200" />
+                            </label>
+                          </div>
+                          <div class="col-12 col-md-8">
+                            <label class="workflows-field">
+                              <span>Body Contains (optional)</span>
+                              <input type="text" [value]="getAssertionConfig(api.id)?.expectedBodyContains ?? ''" (input)="updateAssertionBody(api.id, $any($event.target).value)" placeholder="e.g. success" />
+                            </label>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        }
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button
+            class="workflows-button button--primary versions-btn"
+            type="button"
+            [disabled]="isSavingStep"
+            (click)="saveNewStep(stepsVersionId!)"
+          >
+            @if (isSavingStep) { Saving... }
+            @else if (stepForm.action === 'ASSERT_API' && assertionSelections.size > 0) {
+              Save {{ assertionSelections.size }} Assertion{{ assertionSelections.size > 1 ? 's' : '' }}
+            } @else { Add Step }
+          </button>
+          <button class="workflows-button versions-btn" type="button" (click)="closeAddStep()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Edit step modal ───────────────────────────────────────────────────── -->
+@if (editingStepId) {
+  <div class="version-modal-backdrop" role="dialog" aria-modal="true"
+       (click)="closeEditStep()" (keydown.escape)="closeEditStep()" tabindex="-1">
+    <div class="version-modal version-modal--wide" (click)="$event.stopPropagation()">
+      <div class="modal-header-area d-flex align-items-center justify-content-between gap-3">
+        <div>
+          <p class="text-eyebrow text--primary mb-1">Steps</p>
+          <h3 class="version-modal__title">Edit Step</h3>
+        </div>
+        <button class="version-modal__close" type="button" aria-label="Close" (click)="closeEditStep()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body-area">
+        <ng-container [ngTemplateOutlet]="stepFormTpl"></ng-container>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button
+            class="workflows-button button--primary versions-btn"
+            type="button"
+            [disabled]="isSavingStep"
+            (click)="saveEditStep(stepsVersionId!)"
+          >
+            {{ isSavingStep ? 'Saving...' : 'Save' }}
+          </button>
+          <button class="workflows-button versions-btn" type="button" (click)="closeEditStep()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
 <!-- ── Step form template (shared by edit and add forms) ─────────────────── -->
 <ng-template #stepFormTpl>
+  <div class="step-form-context mb-3">
+    <span class="step-form-context__item">
+      <i class="bi bi-diagram-3 me-1" aria-hidden="true"></i>{{ selectedWorkflow?.name ?? '—' }}
+    </span>
+    <span class="step-form-context__sep">&rsaquo;</span>
+    <span class="step-form-context__item">
+      v{{ selectedVersion?.versionNumber ?? '?' }}@if (selectedVersion?.alias) { <span class="wf-alias-badge ms-1">{{ selectedVersion!.alias }}</span> }
+    </span>
+  </div>
   <div class="row g-2">
     <div class="col-12 col-md-auto">
       <label class="workflows-field">
@@ -920,111 +1047,111 @@
         </label>
       </div>
     }
+
+    <div class="col-12 col-md-3">
+      <label class="workflows-field">
+        <span>Timeout (ms)</span>
+        <input type="number" [value]="stepForm.timeoutMs ?? ''" (input)="stepForm.timeoutMs = +$any($event.target).value || null" placeholder="e.g. 5000" min="0" />
+      </label>
+    </div>
+    <div class="col-12 col-md-2">
+      <label class="workflows-field">
+        <span>Retries</span>
+        <input type="number" [value]="stepForm.retryCount" (input)="stepForm.retryCount = +$any($event.target).value || 0" placeholder="0" min="0" />
+      </label>
+    </div>
+    <div class="col-auto d-flex align-items-end pb-1">
+      <label class="step-optional-field">
+        <input type="checkbox" [checked]="stepForm.optional" (change)="stepForm.optional = $any($event.target).checked" />
+        <span>Optional</span>
+      </label>
+    </div>
+
+    @if (stepForm.action !== 'ASSERT_API') {
+      <div class="col-12">
+        <label class="workflows-field">
+          <span>Meta <span style="text-transform:none;font-weight:500;letter-spacing:0;opacity:.65">(JSON — optional)</span></span>
+          <textarea
+            class="step-meta-editor"
+            [value]="stepForm.metaJson"
+            (input)="stepForm.metaJson = $any($event.target).value"
+            rows="4"
+            placeholder="{}"
+            spellcheck="false"
+            autocomplete="off"
+          ></textarea>
+        </label>
+      </div>
+    }
   </div>
 </ng-template>
 
-<!-- ── Discovered APIs panel ─────────────────────────────────────────────── -->
-@if (discoveryVersionId && discoveryResults.length >= 0) {
-  <section class="surface-panel p-4 mt-4">
-    <header class="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-3">
-      <div class="d-flex align-items-center gap-2">
-        <p class="text-eyebrow text--primary mb-0">Discovered APIs</p>
-        <span class="wf-count-badge">{{ totalDiscoveredApis() }}</span>
-      </div>
-      <button class="workflows-button" type="button" (click)="closeDiscoveryPanel()">
-        <i class="bi bi-x-lg" aria-hidden="true"></i>
-        Close
-      </button>
-    </header>
-
-    @if (totalDiscoveredApis() === 0) {
-      <div class="empty-state empty-state--panel">
-        No API calls were captured during this version's replay.
-      </div>
-    } @else {
-      <div class="main-table-wrap border-main" style="--main-table-min-width: 0">
-        <table class="table table-sm mb-0 align-middle main-table discovery-table">
-          <colgroup>
-            <col style="width: 4rem" />
-            <col style="width: 6rem" />
-            <col style="width: 22%" />
-            <col style="width: 5rem" />
-            <col style="width: auto" />
-            <col style="width: auto" />
-            <col style="width: 8rem" />
-          </colgroup>
-          <thead>
-            <tr>
-              <th>Step</th>
-              <th>Method</th>
-              <th>URL</th>
-              <th>Status</th>
-              <th>Request Body</th>
-              <th>Response Body</th>
-              <th>Discovered</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (api of pagedDiscoveredApis; track api.id) {
-              <tr>
-                <td><span class="wf-count-badge">{{ api.stepOrderIndex }}</span></td>
-                <td>
-                  <span class="workflows-pill" [attr.data-status]="api.method.toLowerCase()">{{ api.method }}</span>
-                </td>
-                <td class="discovery-url-cell">
-                  <span class="details-row__value--code">{{ api.url.length > 100 ? (api.url | slice:0:100) + '…' : api.url }}</span>
-                  @if (api.url.length > 100) {
-                    <button class="discovery-load-more" type="button" (click)="openCellModal('URL', api.url)">Load more</button>
-                  }
-                </td>
-                <td>
-                  @if (api.responseStatus) {
-                    <span class="workflows-pill" [attr.data-status]="api.responseStatus >= 400 ? 'failed' : 'ready'">
-                      {{ api.responseStatus }}
-                    </span>
-                  } @else {
-                    <span>—</span>
-                  }
-                </td>
-                <td class="discovery-body-cell">
-                  @if (api.requestBody) {
-                    <span class="details-row__value--code">{{ api.requestBody.length > 100 ? (api.requestBody | slice:0:100) + '…' : api.requestBody }}</span>
-                    @if (api.requestBody.length > 100) {
-                      <button class="discovery-load-more" type="button" (click)="openCellModal('Request Body', api.requestBody)">Load more</button>
-                    }
-                  } @else {
-                    <span class="text--muted">—</span>
-                  }
-                </td>
-                <td class="discovery-body-cell">
-                  @if (api.responseBody) {
-                    <span class="details-row__value--code">{{ api.responseBody.length > 100 ? (api.responseBody | slice:0:100) + '…' : api.responseBody }}</span>
-                    @if (api.responseBody.length > 100) {
-                      <button class="discovery-load-more" type="button" (click)="openCellModal('Response Body', api.responseBody)">Load more</button>
-                    }
-                  } @else {
-                    <span class="text--muted">—</span>
-                  }
-                </td>
-                <td>{{ formatDateTime(api.discoveredAt) }}</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-      @if (apisTotalPages > 1) {
-        <div class="pagination-bar mt-2">
-          <button class="pagination-btn" type="button" [disabled]="apisPage === 0" (click)="goToApisPage(apisPage - 1)">
-            <i class="bi bi-chevron-left" aria-hidden="true"></i>
-          </button>
-          <span class="pagination-info">{{ apisPage + 1 }} / {{ apisTotalPages }}</span>
-          <button class="pagination-btn" type="button" [disabled]="apisPage >= apisTotalPages - 1" (click)="goToApisPage(apisPage + 1)">
-            <i class="bi bi-chevron-right" aria-hidden="true"></i>
-          </button>
+<!-- ── Discovery step picker modal ───────────────────────────────────────── -->
+@if (showDiscoveryPicker && discoveryPickerVersion) {
+  <div class="version-modal-backdrop" role="dialog" aria-modal="true"
+       (click)="closeDiscoveryPicker()" (keydown.escape)="closeDiscoveryPicker()" tabindex="-1">
+    <div class="version-modal version-modal--wide" (click)="$event.stopPropagation()">
+      <div class="modal-header-area d-flex align-items-center justify-content-between gap-3">
+        <div>
+          <p class="text-eyebrow text--primary mb-1">API Discovery</p>
+          <h3 class="version-modal__title">Select Steps — v{{ discoveryPickerVersion.versionNumber }}@if (discoveryPickerVersion.alias) { <span class="wf-alias-badge ms-2">{{ discoveryPickerVersion.alias }}</span> }</h3>
         </div>
-      }
-    }
-  </section>
+        <button class="version-modal__close" type="button" aria-label="Close" (click)="closeDiscoveryPicker()">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="modal-body-area">
+        @if (isLoadingDiscoveryPickerSteps) {
+          <div class="empty-state empty-state--panel">Loading steps...</div>
+        } @else if (discoveryPickerSteps.length) {
+          <div class="discovery-picker-header">
+            <label class="discovery-picker-check">
+              <input
+                type="checkbox"
+                [checked]="allDiscoveryStepsSelected"
+                (change)="toggleAllDiscoverySteps()"
+              />
+              <span>Select all ({{ discoveryPickerSteps.length }} steps)</span>
+            </label>
+          </div>
+          <div class="discovery-picker-list">
+            @for (step of discoveryPickerSteps; track step.id) {
+              <label class="discovery-picker-check discovery-picker-step"
+                     [class.discovery-picker-step--selected]="discoveryPickerSelectedIds.has(step.id)">
+                <input
+                  type="checkbox"
+                  [checked]="discoveryPickerSelectedIds.has(step.id)"
+                  (change)="toggleDiscoveryStep(step.id)"
+                />
+                <span class="wf-count-badge flex-shrink-0">{{ step.orderIndex }}</span>
+                <span class="workflows-pill flex-shrink-0" [attr.data-status]="statusToken(step.action)">{{ statusLabel(step.action) }}</span>
+                @if (step.selector || step.value) {
+                  <span class="discovery-picker-step__summary details-row__value--code">{{ step.selector || step.value }}</span>
+                }
+              </label>
+            }
+          </div>
+        } @else {
+          <div class="empty-state empty-state--panel">No steps found for this version.</div>
+        }
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <button
+            class="workflows-button button--primary versions-btn"
+            type="button"
+            [disabled]="discoveryPickerSelectedIds.size === 0 || isLoadingDiscoveryPickerSteps"
+            (click)="runDiscovery()"
+          >
+            <i class="bi bi-search" aria-hidden="true"></i>
+            Run Discovery
+            @if (discoveryPickerSelectedIds.size > 0 && discoveryPickerSelectedIds.size < discoveryPickerSteps.length) {
+              ({{ discoveryPickerSelectedIds.size }} of {{ discoveryPickerSteps.length }} steps)
+            }
+          </button>
+          <button class="workflows-button versions-btn" type="button" (click)="closeDiscoveryPicker()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
 }
 
 <!-- ── Version details modal ─────────────────────────────────────────────── -->
@@ -1035,22 +1162,41 @@
       <div class="modal-header-area">
         <div class="d-flex align-items-start justify-content-between gap-3">
           <div>
-            <p class="text-eyebrow text--muted mb-1">{{ modalWorkflowName }}</p>
+            <p class="text-eyebrow text--primary mb-1">{{ modalWorkflowName }}</p>
             <h3 class="version-modal__title">v{{ modalVersion.versionNumber }}</h3>
           </div>
           <button class="version-modal__close" type="button" aria-label="Close version details" (click)="closeVersionModal()">
             <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="d-flex align-items-center gap-2 mt-2">
+        <div class="d-flex align-items-center gap-2 mt-2 flex-wrap">
           <span class="workflows-pill" [attr.data-status]="statusToken(modalVersion.status)">{{ statusLabel(modalVersion.status) }}</span>
+          @if (modalVersion.alias) {
+            <span class="wf-alias-badge">{{ modalVersion.alias }}</span>
+          }
         </div>
+      </div>
+      <div class="modal-footer-actions">
+        <button
+          class="workflows-button button--outline-primary versions-btn"
+          type="button"
+          (click)="navigateToVersionExecutions(modalVersion.workflowId, modalVersion.versionId); closeVersionModal()"
+        >
+          <i class="bi bi-clock-history" aria-hidden="true"></i>
+          View Executions
+        </button>
       </div>
       <div class="modal-field-list">
         <div class="modal-field">
           <span class="modal-field__label">Version ID</span>
           <span class="modal-field__value modal-field__value--code text-break">{{ modalVersion.versionId }}</span>
         </div>
+        @if (modalVersion.alias) {
+          <div class="modal-field">
+            <span class="modal-field__label">Alias</span>
+            <span class="modal-field__value"><span class="wf-alias-badge">{{ modalVersion.alias }}</span></span>
+          </div>
+        }
         <div class="modal-field">
           <span class="modal-field__label">Environment</span>
           <span class="modal-field__value">{{ modalVersion.environmentNameSnapshot || '—' }}</span>
@@ -1075,12 +1221,12 @@
 <!-- ── Workflow details modal ─────────────────────────────────────────────── -->
 @if (modalWorkflow) {
   <div class="version-modal-backdrop" role="dialog" aria-modal="true"
-       (click)="closeWorkflowModal()" (keydown.escape)="closeWorkflowModal()" tabindex="-1">
+       (click)="!isEditingWorkflowModal && closeWorkflowModal()" (keydown.escape)="isEditingWorkflowModal ? cancelEditWorkflowModal() : closeWorkflowModal()" tabindex="-1">
     <div class="version-modal" (click)="$event.stopPropagation()">
       <div class="modal-header-area">
         <div class="d-flex align-items-start justify-content-between gap-3">
           <div>
-            <p class="text-eyebrow text--muted mb-1">Workflow</p>
+            <p class="text-eyebrow text--primary mb-1">Workflow</p>
             <h3 class="version-modal__title">{{ modalWorkflow.name }}</h3>
           </div>
           <button class="version-modal__close" type="button" aria-label="Close workflow details" (click)="closeWorkflowModal()">
@@ -1091,24 +1237,100 @@
           <span class="workflows-pill" data-status="active">{{ versionCountLabel(modalWorkflow.versionsCount) }}</span>
         </div>
       </div>
-      <div class="modal-field-list">
-        <div class="modal-field">
-          <span class="modal-field__label">ID</span>
-          <span class="modal-field__value modal-field__value--code text-break">{{ modalWorkflow.id }}</span>
-        </div>
-        <div class="modal-field">
-          <span class="modal-field__label">Description</span>
-          <span class="modal-field__value">{{ modalWorkflow.description || '—' }}</span>
-        </div>
-        <div class="modal-field">
-          <span class="modal-field__label">Created</span>
-          <span class="modal-field__value">{{ formatDateTime(modalWorkflow.createdAt) }}</span>
-        </div>
-        <div class="modal-field">
-          <span class="modal-field__label">Updated</span>
-          <span class="modal-field__value">{{ formatDateTime(modalWorkflow.updatedAt) }}</span>
-        </div>
+
+      <div class="modal-footer-actions">
+        <button
+          class="workflows-button button--outline-primary versions-btn"
+          type="button"
+          (click)="navigateToWorkflowVersions(modalWorkflow.id)"
+        >
+          <i class="bi bi-layers" aria-hidden="true"></i>
+          View Versions
+        </button>
+        @if (!isEditingWorkflowModal) {
+          <button
+            class="workflows-button button--outline-primary versions-btn"
+            type="button"
+            (click)="openEditWorkflowModal()"
+          >
+            <i class="bi bi-pencil" aria-hidden="true"></i>
+            Edit
+          </button>
+        }
       </div>
+
+      @if (isEditingWorkflowModal) {
+        <div class="modal-body-area">
+          <form [formGroup]="workflowEditForm" (ngSubmit)="saveWorkflowEdit()" novalidate class="d-grid gap-3">
+            <label class="workflows-field">
+              <span>Name</span>
+              <input
+                type="text"
+                formControlName="name"
+                placeholder="Workflow name"
+                maxlength="160"
+                [class.workflows-field__control--invalid]="isWorkflowEditFieldInvalid('name')"
+              />
+              @if (isWorkflowEditFieldInvalid('name')) {
+                <small class="workflows-field__error">
+                  @if (workflowEditForm.controls.name.hasError('required')) { Name is required. }
+                  @else { Use 160 characters or fewer. }
+                </small>
+              }
+            </label>
+            <label class="workflows-field">
+              <span>Description</span>
+              <textarea
+                formControlName="description"
+                placeholder="What this workflow covers"
+                maxlength="2000"
+                rows="3"
+                [class.workflows-field__control--invalid]="isWorkflowEditFieldInvalid('description')"
+              ></textarea>
+              @if (isWorkflowEditFieldInvalid('description')) {
+                <small class="workflows-field__error">Use 2000 characters or fewer.</small>
+              }
+            </label>
+            <div class="d-flex justify-content-end gap-2">
+              <button class="workflows-button button--primary" type="submit" [disabled]="isSavingWorkflowEdit">
+                {{ isSavingWorkflowEdit ? 'Saving...' : 'Save' }}
+              </button>
+              <button class="workflows-button" type="button" [disabled]="isSavingWorkflowEdit" (click)="cancelEditWorkflowModal()">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      } @else {
+        <div class="modal-field-list">
+          <div class="modal-field">
+            <span class="modal-field__label">ID</span>
+            <span class="modal-field__value modal-field__value--code text-break">{{ modalWorkflow.id }}</span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field__label">Name</span>
+            <span class="modal-field__value">{{ modalWorkflow.name }}</span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field__label">Description</span>
+            <span class="modal-field__value">{{ modalWorkflow.description || '—' }}</span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field__label">Versions</span>
+            <span class="modal-field__value">
+              <span class="workflows-pill" data-status="active">{{ modalWorkflow.versionsCount }}</span>
+            </span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field__label">Created</span>
+            <span class="modal-field__value">{{ formatDateTime(modalWorkflow.createdAt) }}</span>
+          </div>
+          <div class="modal-field">
+            <span class="modal-field__label">Updated</span>
+            <span class="modal-field__value">{{ formatDateTime(modalWorkflow.updatedAt) }}</span>
+          </div>
+        </div>
+      }
     </div>
   </div>
 }
@@ -1121,19 +1343,48 @@
       <div class="modal-header-area">
         <div class="d-flex align-items-start justify-content-between gap-3">
           <div>
-            <p class="text-eyebrow text--muted mb-1">Step {{ modalStep.orderIndex }}</p>
+            <p class="text-eyebrow text--primary mb-1">
+              {{ selectedWorkflow?.name ?? '—' }} &rsaquo; v{{ selectedVersion?.versionNumber ?? '?' }}
+            </p>
             <h3 class="version-modal__title">{{ statusLabel(modalStep.action) }}</h3>
           </div>
           <button class="version-modal__close" type="button" aria-label="Close step details" (click)="closeStepModal()">
             <i class="bi bi-x-lg" aria-hidden="true"></i>
           </button>
         </div>
-        <div class="d-flex align-items-center gap-2 mt-2">
+        <div class="d-flex align-items-center gap-2 mt-2 flex-wrap">
           <span class="workflows-pill" [attr.data-status]="statusToken(modalStep.action)">{{ statusLabel(modalStep.action) }}</span>
           <span class="workflows-pill" data-status="ready">{{ statusLabel(modalStep.source) }}</span>
+          @if (modalStep.optional) {
+            <span class="workflows-pill" data-status="draft">Optional</span>
+          }
         </div>
       </div>
+      <div class="modal-footer-actions">
+        <button
+          class="workflows-button button--outline-primary versions-btn"
+          type="button"
+          (click)="openEditStep(modalStep!)"
+        >
+          <i class="bi bi-pencil" aria-hidden="true"></i>
+          Edit Step
+        </button>
+        @if (discoveredApisForStep(modalStep.id).length > 0) {
+          <button
+            class="workflows-button button--outline-primary versions-btn"
+            type="button"
+            (click)="navigateToStepApis(modalStep!.id); closeStepModal()"
+          >
+            <i class="bi bi-plug-fill" aria-hidden="true"></i>
+            View APIs ({{ discoveredApisForStep(modalStep.id).length }})
+          </button>
+        }
+      </div>
       <div class="modal-field-list">
+        <div class="modal-field">
+          <span class="modal-field__label">Order</span>
+          <span class="modal-field__value"><span class="wf-count-badge">{{ modalStep.orderIndex }}</span></span>
+        </div>
         @if (modalStep.selector) {
           <div class="modal-field">
             <span class="modal-field__label">Selector</span>
@@ -1155,25 +1406,146 @@
         @if (modalStep.meta && metaString(modalStep.meta) !== '{}') {
           <div class="modal-field">
             <span class="modal-field__label">Meta</span>
-            <span class="modal-field__value modal-field__value--code text-break" style="white-space: pre-wrap">{{ metaString(modalStep.meta) }}</span>
+            <span class="modal-field__value modal-field__value--code modal-field__value--pre text-break">{{ metaString(modalStep.meta) }}</span>
           </div>
         }
-        @if (modalStep.timeoutMs) {
+        @if (modalStep.timeoutMs != null) {
           <div class="modal-field">
             <span class="modal-field__label">Timeout</span>
             <span class="modal-field__value">{{ modalStep.timeoutMs }}ms</span>
           </div>
         }
-        @if (modalStep.retryCount) {
-          <div class="modal-field">
-            <span class="modal-field__label">Retries</span>
-            <span class="modal-field__value">{{ modalStep.retryCount }}</span>
-          </div>
-        }
+        <div class="modal-field">
+          <span class="modal-field__label">Retries</span>
+          <span class="modal-field__value">{{ modalStep.retryCount }}</span>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field__label">Optional</span>
+          <span class="modal-field__value">{{ modalStep.optional ? 'Yes' : 'No' }}</span>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field__label">Workflow</span>
+          <span class="modal-field__value">{{ selectedWorkflow?.name ?? '—' }}</span>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field__label">Version</span>
+          <span class="modal-field__value">v{{ selectedVersion?.versionNumber ?? '?' }}@if (selectedVersion?.alias) { <span class="wf-alias-badge ms-1">{{ selectedVersion!.alias }}</span> }</span>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field__label">Created</span>
+          <span class="modal-field__value">{{ formatDateTime(modalStep.createdAt) }}</span>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field__label">Updated</span>
+          <span class="modal-field__value">{{ formatDateTime(modalStep.updatedAt) }}</span>
+        </div>
         <div class="modal-field">
           <span class="modal-field__label">Step ID</span>
           <span class="modal-field__value modal-field__value--code text-break">{{ modalStep.id }}</span>
         </div>
+      </div>
+
+    </div>
+  </div>
+}
+
+<!-- ── Delete workflow confirmation modal ────────────────────────────────── -->
+@if (deletePreviewWorkflowId) {
+  <div class="version-modal-backdrop" role="dialog" aria-modal="true"
+       (click)="!isDeletingWorkflow && cancelDeleteWorkflow()" (keydown.escape)="!isDeletingWorkflow && cancelDeleteWorkflow()" tabindex="-1">
+    <div class="version-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header-area">
+        <div class="d-flex align-items-start justify-content-between gap-3">
+          <div>
+            <p class="text-eyebrow text--primary mb-1">Workflow</p>
+            <h3 class="version-modal__title">Delete "{{ deletePreviewWorkflow?.name }}"?</h3>
+          </div>
+          <button class="version-modal__close" type="button" aria-label="Close" [disabled]="isDeletingWorkflow" (click)="cancelDeleteWorkflow()">
+            <i class="bi bi-x-lg" aria-hidden="true"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-body-area">
+        @if (isLoadingDeletePreview) {
+          <div class="empty-state empty-state--panel">Calculating impact...</div>
+        } @else if (deleteWorkflowPreview) {
+          <p class="mb-3" style="font-size: 0.9rem; color: var(--dashboard-text-mid)">
+            Deleting this workflow will also affect the following data.
+          </p>
+
+          <div class="delete-preview-list">
+            @if (deleteWorkflowPreview.versionsCount || deleteWorkflowPreview.stepsCount) {
+              <div class="delete-preview-group">
+                <p class="delete-preview-group__label">
+                  <i class="bi bi-archive me-1" aria-hidden="true"></i>
+                  Archived <span class="delete-preview-group__note">(soft-deleted, recoverable)</span>
+                </p>
+                @if (deleteWorkflowPreview.versionsCount) {
+                  <div class="delete-preview-row">
+                    <span class="wf-count-badge">{{ deleteWorkflowPreview.versionsCount }}</span>
+                    <span>version{{ deleteWorkflowPreview.versionsCount === 1 ? '' : 's' }}</span>
+                  </div>
+                }
+                @if (deleteWorkflowPreview.stepsCount) {
+                  <div class="delete-preview-row">
+                    <span class="wf-count-badge">{{ deleteWorkflowPreview.stepsCount }}</span>
+                    <span>step{{ deleteWorkflowPreview.stepsCount === 1 ? '' : 's' }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (deleteWorkflowPreview.executionsCount || deleteWorkflowPreview.discoveredApisCount) {
+              <div class="delete-preview-group delete-preview-group--danger">
+                <p class="delete-preview-group__label">
+                  <i class="bi bi-trash me-1" aria-hidden="true"></i>
+                  Permanently deleted <span class="delete-preview-group__note">(cannot be recovered)</span>
+                </p>
+                @if (deleteWorkflowPreview.executionsCount) {
+                  <div class="delete-preview-row">
+                    <span class="wf-count-badge">{{ deleteWorkflowPreview.executionsCount }}</span>
+                    <span>execution{{ deleteWorkflowPreview.executionsCount === 1 ? '' : 's' }} and all step results</span>
+                  </div>
+                }
+                @if (deleteWorkflowPreview.discoveredApisCount) {
+                  <div class="delete-preview-row">
+                    <span class="wf-count-badge">{{ deleteWorkflowPreview.discoveredApisCount }}</span>
+                    <span>discovered API{{ deleteWorkflowPreview.discoveredApisCount === 1 ? '' : 's' }}</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @if (!deleteWorkflowPreview.versionsCount && !deleteWorkflowPreview.stepsCount &&
+                 !deleteWorkflowPreview.executionsCount && !deleteWorkflowPreview.discoveredApisCount) {
+              <p style="font-size: 0.85rem; color: var(--dashboard-muted)">No associated data — only the workflow record will be removed.</p>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="modal-footer-actions">
+        <button
+          class="workflows-button button--danger versions-btn"
+          type="button"
+          [disabled]="isDeletingWorkflow || isLoadingDeletePreview"
+          (click)="confirmDeleteWorkflow()"
+        >
+          @if (isDeletingWorkflow) {
+            <i class="bi bi-arrow-repeat versions-spin" aria-hidden="true"></i>
+            Deleting...
+          } @else {
+            <i class="bi bi-trash" aria-hidden="true"></i>
+            Delete permanently
+          }
+        </button>
+        <button
+          class="workflows-button versions-btn"
+          type="button"
+          [disabled]="isDeletingWorkflow"
+          (click)="cancelDeleteWorkflow()"
+        >Cancel</button>
       </div>
     </div>
   </div>
@@ -1186,7 +1558,7 @@
     <div class="version-modal cell-modal" (click)="$event.stopPropagation()">
       <div class="modal-header-area d-flex align-items-start justify-content-between gap-3">
         <div>
-          <p class="text-eyebrow text--muted mb-0">Full content</p>
+          <p class="text-eyebrow text--primary mb-0">Full content</p>
           <h3 class="version-modal__title">{{ cellModalLabel }}</h3>
         </div>
         <button class="version-modal__close" type="button" aria-label="Close" (click)="closeCellModal()">

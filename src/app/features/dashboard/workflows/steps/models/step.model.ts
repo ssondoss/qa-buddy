@@ -30,4 +30,6 @@ export interface StepView {
   optional: boolean;
   timeoutMs: number | null;
   retryCount: number;
+  createdAt: string;
+  updatedAt: string;
 }

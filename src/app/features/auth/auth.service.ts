@@ -27,4 +27,16 @@ export class AuthService {
   resendVerification(payload: ResendVerificationRequest): Observable<ResendVerificationResponseData> {
     return this.http.post<ResendVerificationResponseData>(`${this.base}/resend-verification`, payload);
   }
+
+  refreshToken(refreshToken: string): Observable<LoginResponseData> {
+    return this.http.post<LoginResponseData>(`${this.base}/refresh`, { refreshToken });
+  }
+
+  forgotPassword(email: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.base}/reset-password`, { token, newPassword });
+  }
 }

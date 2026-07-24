@@ -10,10 +10,11 @@ export class DiscoveryService {
 
   constructor(private readonly http: HttpClient) {}
 
-  discoverApis(workflowId: string, versionId: string): Observable<StepApiDiscoveryResult[]> {
+  discoverApis(workflowId: string, versionId: string, stepIds?: string[]): Observable<StepApiDiscoveryResult[]> {
+    const body = stepIds?.length ? { stepIds } : {};
     return this.http.post<StepApiDiscoveryResult[]>(
       `${this.base}/${workflowId}/versions/${versionId}/discover-apis`,
-      {},
+      body,
     );
   }
 

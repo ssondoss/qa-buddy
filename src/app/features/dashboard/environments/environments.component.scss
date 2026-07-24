@@ -2,226 +2,275 @@
   display: block;
 }
 
-.env-page,
-.env-form,
-.env-details {
+.toolbar-spin {
+  animation: env-spin 0.75s linear infinite;
+}
+
+// ── Count badge ───────────────────────────────────────────────────────────────
+
+.wf-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--dashboard-size-badge);
+  height: var(--dashboard-size-badge);
+  padding: 0 var(--dashboard-space-2);
+  border: 1px solid rgba(53, 208, 186, 0.3);
+  border-radius: 999px;
+  background: rgba(53, 208, 186, 0.1);
+  color: var(--color-accent-cyan);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+// ── Description cell ──────────────────────────────────────────────────────────
+
+.env-description {
+  display: block;
+  max-width: 36rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Optional label ────────────────────────────────────────────────────────────
+
+.env-field-optional {
+  text-transform: none;
+  font-weight: 500;
+  letter-spacing: 0;
+  opacity: 0.65;
+}
+
+// ── Action button styles ──────────────────────────────────────────────────────
+
+.versions-btn {
+  justify-content: center;
+  height: 1.7rem;
+  min-height: 1.7rem;
+  padding: 0 0.6rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.step-btn--danger {
+  color: var(--dashboard-danger);
+
+  &:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.1);
+    border-color: rgba(239, 68, 68, 0.3);
+  }
+}
+
+.delete-confirm-text {
+  color: var(--dashboard-danger);
+  font-size: 0.74rem;
+  font-weight: 800;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+
+.versions-spin {
+  display: inline-block;
+  animation: env-spin 0.75s linear infinite;
+}
+
+@keyframes env-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ── Tooltip wrapper ───────────────────────────────────────────────────────────
+
+.version-execute-wrap {
+  position: relative;
+
+  &:hover .version-tooltip,
+  &:focus-within .version-tooltip {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+}
+
+.version-tooltip {
+  position: absolute;
+  right: 0;
+  bottom: calc(100% + 6px);
+  z-index: 20;
+  padding: 0.28rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-sm);
+  background: rgba(42, 48, 58, 0.98);
+  color: var(--color-ink-900);
+  font-size: 0.72rem;
+  white-space: nowrap;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+}
+
+// ── Modal backdrop ────────────────────────────────────────────────────────────
+
+.version-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
   display: grid;
-  gap: 1rem;
-}
-
-.env-toolbar,
-.env-panel,
-.env-metric {
-  border: 1px solid var(--dashboard-border);
-  border-radius: var(--radius-md);
-  background: var(--dashboard-panel);
-  box-shadow: var(--dashboard-shadow);
-}
-
-.env-toolbar,
-.env-panel {
+  place-items: center;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(3px);
   padding: 1rem;
 }
 
-.env-toolbar,
-.env-actions,
-.env-panel__header,
-.env-form__actions,
-.env-details__actions {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
+.version-modal {
+  width: min(90vw, 38rem);
+  max-height: 88vh;
+  overflow-y: auto;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-md);
+  background: rgba(28, 32, 40, 0.98);
+  backdrop-filter: blur(20px) saturate(1.2);
+  box-shadow:
+    0 28px 72px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  &--form {
+    width: min(90vw, 42rem);
+  }
 }
 
-.env-toolbar h1,
-.env-panel h2 {
+.modal-header-area {
+  padding: 1.3rem 1.5rem 1rem;
+  background: linear-gradient(135deg, rgba(246, 215, 84, 0.07) 0%, transparent 55%);
+  border-bottom: 1px solid var(--dashboard-line-soft);
+}
+
+.modal-body-area {
+  padding: 1.3rem 1.5rem 1.5rem;
+}
+
+.version-modal__title {
   margin: 0;
-  color: var(--color-ink-900);
+  color: rgba(248, 250, 252, 0.97);
   font-family: var(--font-display);
-}
-
-.env-eyebrow,
-.env-field span,
-.env-metric span,
-.env-table th,
-.env-info dt {
-  margin: 0 0 0.35rem;
-  color: var(--dashboard-muted);
-  font-size: 0.76rem;
+  font-size: 1.08rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
 }
 
-.env-eyebrow {
-  color: var(--color-primary-yellow);
-}
-
-.env-button {
-  min-height: 2.6rem;
-  padding: 0 0.95rem;
-  border: 1px solid var(--dashboard-border-strong);
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--color-ink-850);
-  font-weight: 750;
-  cursor: pointer;
-}
-
-.env-button--primary {
-  border-color: transparent;
-  background: var(--color-primary-yellow);
-  color: #111827;
-}
-
-.env-button--danger {
-  border-color: rgba(251, 113, 133, 0.34);
-  color: var(--dashboard-danger);
-}
-
-.env-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
-.env-field {
+.version-modal__close {
+  flex: 0 0 auto;
   display: grid;
-  gap: 0.45rem;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--dashboard-muted-soft);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-ink-900);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
 }
 
-.env-field input {
-  min-height: 3rem;
-  padding: 0 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: var(--radius-sm);
-  background: rgba(3, 7, 18, 0.72);
-  color: var(--color-ink-900);
-  outline: none;
+// ── Modal footer actions ──────────────────────────────────────────────────────
+
+.modal-footer-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.85rem 1.5rem;
+  border-bottom: 1px solid var(--dashboard-line-soft);
 }
 
-.env-field input:focus {
-  border-color: var(--color-primary-yellow);
-  box-shadow: 0 0 0 3px var(--color-primary-yellow-soft);
+// ── URL link and copy button inside info modal ────────────────────────────────
+
+.modal-url-link {
+  color: var(--color-accent-cyan);
+  text-decoration: none;
+  word-break: break-all;
+
+  &:hover {
+    text-decoration: underline;
+    color: var(--color-accent-cyan);
+  }
 }
 
-.env-field__control--invalid {
-  border-color: var(--dashboard-danger) !important;
+.modal-copy-btn {
+  width: 1.7rem;
+  padding: 0;
 }
 
-.env-field__error {
+// ── Details modal field list ──────────────────────────────────────────────────
+
+.modal-field-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-field {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 1rem;
+  padding: 0.65rem 1.5rem;
+  align-items: baseline;
+  border-bottom: 1px solid var(--dashboard-line-soft);
+
+  &:last-child {
+    border-bottom: 0;
+    padding-bottom: 1.1rem;
+  }
+}
+
+.modal-field__label {
+  flex-shrink: 0;
+  color: var(--dashboard-text-mid);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  padding-top: 0.1rem;
+}
+
+.modal-field__value {
+  color: var(--dashboard-text-high);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.modal-field__value--code {
+  font-family: ui-monospace, 'SFMono-Regular', 'SF Mono', Menlo, Monaco, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--dashboard-text-code);
+}
+
+// ── Form field overrides (inside modal) ───────────────────────────────────────
+
+.workflows-field__error {
   color: var(--dashboard-danger);
   font-size: 0.84rem;
 }
 
-.env-banner,
-.env-empty {
-  margin: 0;
-  padding: 0.9rem 1rem;
-  border-radius: var(--radius-sm);
-}
-
-.env-banner--error {
-  background: rgba(71, 17, 29, 0.68);
-  color: var(--dashboard-danger);
-}
-
-.env-banner--success {
-  background: rgba(14, 69, 61, 0.58);
-  color: var(--dashboard-success);
-}
-
-.env-summary,
-.env-layout {
-  display: grid;
-  gap: 1rem;
-}
-
-.env-summary {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-}
-
-.env-layout {
-  grid-template-columns: minmax(0, 1.55fr) minmax(22rem, 0.75fr);
-}
-
-.env-metric strong {
-  display: block;
-  color: var(--color-ink-900);
-  font-size: 1.55rem;
-}
-
-.env-table-wrap {
-  overflow-x: auto;
-}
-
-.env-table {
-  width: 100%;
-  min-width: 52rem;
-  border-collapse: collapse;
-}
-
-.env-table th,
-.env-table td {
-  padding: 0.85rem 0.75rem;
-  border-bottom: 1px solid var(--dashboard-border);
-  text-align: left;
-}
-
-.env-table td,
-.env-info dd {
-  color: var(--color-ink-900);
-}
-
-.env-table tbody tr {
-  cursor: pointer;
-}
-
-.env-table tbody tr:hover,
-.env-table__row--active {
-  background: rgba(246, 215, 84, 0.08);
-}
-
-.env-table__row--active {
-  box-shadow: inset 3px 0 0 var(--color-primary-yellow);
-}
-
-.env-info {
-  display: grid;
-  gap: 0.65rem;
-  margin: 0;
-}
-
-.env-info div {
-  padding: 0.8rem;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.035);
-}
-
-.env-info dt,
-.env-info dd {
-  margin: 0;
-}
-
-.env-info dd {
-  margin-top: 0.35rem;
-  overflow-wrap: anywhere;
-  font-weight: 700;
-}
-
-.env-empty {
-  display: grid;
-  place-items: center;
-  min-height: 10rem;
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  color: var(--dashboard-muted-soft);
-}
-
-@media (max-width: 1180px) {
-  .env-layout,
-  .env-summary {
-    grid-template-columns: 1fr;
-  }
+.workflows-field__control--invalid {
+  border-color: var(--dashboard-danger) !important;
 }

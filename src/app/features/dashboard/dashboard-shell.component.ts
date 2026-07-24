@@ -21,6 +21,7 @@ export class DashboardShellComponent {
     { label: 'Executions', route: '/dashboard/executions' },
     { label: 'Scheduled', route: '/dashboard/scheduled' },
     { label: 'Reports', route: '/dashboard/reports' },
+    { label: 'Discovered APIs', route: '/dashboard/discovered-apis' },
   ];
 }
 

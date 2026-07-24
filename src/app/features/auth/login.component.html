@@ -74,6 +74,10 @@
               }
             </label>
 
+            @if (passwordResetSuccess) {
+              <p class="auth-banner auth-banner--success mb-0">Password updated successfully. Sign in with your new password.</p>
+            }
+
             @if (error) {
               <p class="auth-banner auth-banner--error mb-0">{{ error }}</p>
             }
@@ -86,6 +90,10 @@
           <p class="auth-switch mb-0">
             Need an account?
             <a routerLink="/register">Create one</a>
+          </p>
+
+          <p class="auth-switch mb-0">
+            <a routerLink="/forgot-password">Forgot password?</a>
           </p>
         </section>
       </div>

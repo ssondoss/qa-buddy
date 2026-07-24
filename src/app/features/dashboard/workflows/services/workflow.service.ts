@@ -4,7 +4,10 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import type { PaginatedResponse } from '../../../../shared/api-response.model';
 import type {
+  RecordingStartResponse,
+  VersionAliasUpdateRequest,
   VersionView,
+  WorkflowDeletePreview,
   WorkflowRecordingStartRequest,
   WorkflowResponse,
   WorkflowUpsertRequest,
@@ -39,18 +42,34 @@ export class WorkflowService {
     return this.http.put<WorkflowResponse>(`${this.base}/${workflowId}`, payload);
   }
 
+  getDeletePreview(workflowId: string): Observable<WorkflowDeletePreview> {
+    return this.http.get<WorkflowDeletePreview>(`${this.base}/${workflowId}/delete-preview`);
+  }
+
   delete(workflowId: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${workflowId}`);
+  }
+
+  duplicateVersion(workflowId: string, versionId: string): Observable<VersionView> {
+    return this.http.post<VersionView>(`${this.base}/${workflowId}/versions/${versionId}/duplicate`, {});
   }
 
   deleteVersion(workflowId: string, versionId: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/${workflowId}/versions/${versionId}`);
   }
 
+  updateVersionAlias(workflowId: string, versionId: string, payload: VersionAliasUpdateRequest): Observable<VersionView> {
+    return this.http.patch<VersionView>(`${this.base}/${workflowId}/versions/${versionId}/alias`, payload);
+  }
+
   startRecording(
     workflowId: string,
     payload: WorkflowRecordingStartRequest,
-  ): Observable<WorkflowResponse> {
-    return this.http.post<WorkflowResponse>(`${this.recordingBase}/start/${workflowId}`, payload);
+  ): Observable<RecordingStartResponse> {
+    return this.http.post<RecordingStartResponse>(`${this.recordingBase}/start/${workflowId}`, payload);
+  }
+
+  recordingStatusUrl(versionId: string): string {
+    return `${this.recordingBase}/status/${versionId}`;
   }
 }

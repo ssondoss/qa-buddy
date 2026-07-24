@@ -210,6 +210,22 @@ body {
     0 4px 14px rgba(246, 215, 84, 0.18);
 }
 
+/* ── Danger ── */
+.button--danger {
+  padding: 0 1.2rem;
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--dashboard-danger);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.button--danger:hover:not(:disabled),
+.button--danger:focus-visible:not(:disabled) {
+  background: rgba(248, 113, 113, 0.22);
+  border-color: rgba(248, 113, 113, 0.7);
+}
+
 /* ── Active / "Hide Recorder" ── */
 .workflows-button--active {
   border-color: rgba(251, 113, 133, 0.42);
@@ -328,6 +344,7 @@ body {
 .surface-panel {
   border: 1px solid var(--dashboard-line-strong);
   border-radius: var(--radius-md);
+  background: var(--dashboard-surface-glass);
   backdrop-filter: blur(20px) saturate(1.3);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.12),

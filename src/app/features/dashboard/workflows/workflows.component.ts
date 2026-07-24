@@ -1,5 +1,5 @@
 import { Component, DestroyRef, OnInit, inject } from '@angular/core';
-import { NgTemplateOutlet, SlicePipe } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import {
@@ -9,11 +9,14 @@ import {
   ValidationErrors,
   Validators,
 } from '@angular/forms';
+import { Router } from '@angular/router';
 import type { EnvironmentResponse } from '../environments/models/environment.model';
 import { EnvironmentService } from '../environments/services/environment.service';
 import type { RecordingPhase } from './record/models/record-contract.model';
 import type {
+  VersionAliasUpdateRequest,
   VersionView,
+  WorkflowDeletePreview,
   WorkflowRecordingStartRequest,
   WorkflowResponse,
   WorkflowUpsertRequest,
@@ -24,11 +27,12 @@ import { DiscoveryService } from './steps/services/discovery.service';
 import { StepService } from './steps/services/step.service';
 import type { StepApiDiscoveryResult, StepDiscoveredApiView } from './steps/models/discovered-api.model';
 import type { StepAction, StepRequest, StepView } from './steps/models/step.model';
+import type { ExecutionView } from '../executions/models/execution.model';
 
 @Component({
   selector: 'app-workflows',
   standalone: true,
-  imports: [ReactiveFormsModule, NgTemplateOutlet, SlicePipe],
+  imports: [ReactiveFormsModule, NgTemplateOutlet],
   templateUrl: './workflows.component.html',
   styleUrl: './workflows.component.scss',
 })
@@ -62,7 +66,15 @@ export class WorkflowsComponent implements OnInit {
   discoveryResults: StepApiDiscoveryResult[] = [];
   discoveryVersionId: string | null = null;
 
+  showDiscoveryPicker = false;
+  discoveryPickerWorkflowId = '';
+  discoveryPickerVersion: VersionView | null = null;
+  discoveryPickerSteps: StepView[] = [];
+  discoveryPickerSelectedIds = new Set<string>();
+  isLoadingDiscoveryPickerSteps = false;
+
   versionSteps: StepView[] = [];
+  versionExecutions: ExecutionView[] = [];
   stepsVersionId: string | null = null;
   isLoadingSteps = false;
 
@@ -75,8 +87,20 @@ export class WorkflowsComponent implements OnInit {
   draggingStepId: string | null = null;
   dropTargetStepId: string | null = null;
 
+  // Alias editing
+  editingAliasVersionId: string | null = null;
+  aliasInputValue = '';
+  isSavingAlias = false;
+
+  // Duplicate state
+  duplicatingVersionId: string | null = null;
+  duplicatingStepId: string | null = null;
+
   // Delete confirmations
-  confirmingDeleteWorkflowId: string | null = null;
+  deletePreviewWorkflowId: string | null = null;
+  deletePreviewWorkflow: WorkflowResponse | null = null;
+  deleteWorkflowPreview: WorkflowDeletePreview | null = null;
+  isLoadingDeletePreview = false;
   isDeletingWorkflow = false;
   confirmingDeleteVersionId: string | null = null;
   isDeletingVersion = false;
@@ -87,6 +111,9 @@ export class WorkflowsComponent implements OnInit {
     value: string;
     expectedValue: string;
     timeoutMs: number | null;
+    optional: boolean;
+    retryCount: number;
+    metaJson: string;
     apiUrl: string;
     apiMethod: string;
     apiExpectedStatus: number | null;
@@ -97,6 +124,9 @@ export class WorkflowsComponent implements OnInit {
     value: '',
     expectedValue: '',
     timeoutMs: null,
+    optional: false,
+    retryCount: 0,
+    metaJson: '{}',
     apiUrl: '',
     apiMethod: 'GET',
     apiExpectedStatus: null,
@@ -120,13 +150,14 @@ export class WorkflowsComponent implements OnInit {
   stepsPage = 0;
   readonly stepsPageSize = 5;
 
-  // Discovered APIs frontend-slice pagination
-  apisPage = 0;
-  readonly apisPageSize = 10;
-
   // Detail modals
   modalWorkflow: WorkflowResponse | null = null;
   modalStep: StepView | null = null;
+  isEditingWorkflowModal = false;
+  isSavingWorkflowEdit = false;
+
+  // Auto-select after recording
+  pendingVersionSelect: { workflowId: string; versionId: string } | null = null;
 
   workflows: WorkflowResponse[] = [];
   recordingEnvironments: EnvironmentResponse[] = [];
@@ -135,10 +166,17 @@ export class WorkflowsComponent implements OnInit {
     name: ['', [Validators.required, Validators.maxLength(160)]],
     description: ['', [Validators.maxLength(2000)]],
   });
+  readonly workflowEditForm = this.formBuilder.nonNullable.group({
+    name: ['', [Validators.required, Validators.maxLength(160)]],
+    description: ['', [Validators.maxLength(2000)]],
+  });
   readonly recordingForm = this.formBuilder.nonNullable.group({
     environmentId: ['', [Validators.required]],
     startPath: ['', [Validators.maxLength(1000), this.relativePathValidator]],
+    alias: ['', [Validators.maxLength(100)]],
   });
+
+  private recordingEmitter: EventSource | null = null;
 
   constructor(
     readonly environmentService: EnvironmentService,
@@ -146,8 +184,12 @@ export class WorkflowsComponent implements OnInit {
     readonly executionService: ExecutionService,
     readonly discoveryService: DiscoveryService,
     readonly stepService: StepService,
+    readonly router: Router,
   ) {
-    this.destroyRef.onDestroy(() => this.clearNotificationTimer());
+    this.destroyRef.onDestroy(() => {
+      this.clearNotificationTimer();
+      this.closeRecordingEmitter();
+    });
   }
 
   ngOnInit(): void {
@@ -177,21 +219,6 @@ export class WorkflowsComponent implements OnInit {
 
   get stepsTotalPages(): number {
     return Math.max(1, Math.ceil(this.versionSteps.length / this.stepsPageSize));
-  }
-
-  get flatDiscoveredApis(): Array<StepDiscoveredApiView & { stepOrderIndex: number; stepAction: string }> {
-    return this.discoveryResults.flatMap((r) =>
-      r.apis.map((api) => ({ ...api, stepOrderIndex: r.orderIndex, stepAction: r.action })),
-    );
-  }
-
-  get pagedDiscoveredApis(): Array<StepDiscoveredApiView & { stepOrderIndex: number; stepAction: string }> {
-    const start = this.apisPage * this.apisPageSize;
-    return this.flatDiscoveredApis.slice(start, start + this.apisPageSize);
-  }
-
-  get apisTotalPages(): number {
-    return Math.max(1, Math.ceil(this.flatDiscoveredApis.length / this.apisPageSize));
   }
 
   loadWorkflows(page = 0): void {
@@ -262,8 +289,13 @@ export class WorkflowsComponent implements OnInit {
     this.error = null;
   }
 
-  toggleCapturePanel(): void {
-    this.showCapturePanel = !this.showCapturePanel;
+  openRecordingModal(): void {
+    this.showCapturePanel = true;
+  }
+
+  closeRecordingModal(): void {
+    this.showCapturePanel = false;
+    this.recordingForm.patchValue({ alias: '' });
   }
 
   selectVersionRow(version: VersionView, workflowId: string): void {
@@ -277,7 +309,6 @@ export class WorkflowsComponent implements OnInit {
     this.expandedVersionId = version.versionId;
     this.discoveryResults = [];
     this.discoveryVersionId = null;
-    this.apisPage = 0;
     this.loadStepsForVersion(version.versionId);
 
     if (version.status !== 'READY') return;
@@ -324,6 +355,16 @@ export class WorkflowsComponent implements OnInit {
             [workflowId]: { page: response.page, totalPages: response.totalPages },
           };
           this.versionsLoadingMap = { ...this.versionsLoadingMap, [workflowId]: false };
+
+          if (this.pendingVersionSelect?.workflowId === workflowId) {
+            const target = response.items.find(
+              (v) => v.versionId === this.pendingVersionSelect!.versionId,
+            );
+            if (target) {
+              this.pendingVersionSelect = null;
+              this.selectVersionRow(target, workflowId);
+            }
+          }
         },
         error: () => {
           this.versionsMap = { ...this.versionsMap, [workflowId]: [] };
@@ -348,6 +389,62 @@ export class WorkflowsComponent implements OnInit {
 
   closeWorkflowModal(): void {
     this.modalWorkflow = null;
+    this.isEditingWorkflowModal = false;
+  }
+
+  openEditWorkflowModal(): void {
+    if (!this.modalWorkflow) return;
+    this.workflowEditForm.reset({
+      name: this.modalWorkflow.name,
+      description: this.modalWorkflow.description ?? '',
+    });
+    this.isEditingWorkflowModal = true;
+  }
+
+  cancelEditWorkflowModal(): void {
+    this.isEditingWorkflowModal = false;
+  }
+
+  saveWorkflowEdit(): void {
+    if (!this.modalWorkflow) return;
+    if (this.workflowEditForm.invalid) {
+      this.workflowEditForm.markAllAsTouched();
+      return;
+    }
+    const { name, description } = this.workflowEditForm.getRawValue();
+    const trimmedName = name.trim();
+    const trimmedDesc = description.trim();
+    if (!trimmedName) {
+      this.workflowEditForm.controls.name.setErrors({ required: true });
+      return;
+    }
+    const payload: WorkflowUpsertRequest = trimmedDesc ? { name: trimmedName, description: trimmedDesc } : { name: trimmedName };
+    this.isSavingWorkflowEdit = true;
+    this.workflowService
+      .update(this.modalWorkflow.id, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (updated) => {
+          this.isSavingWorkflowEdit = false;
+          this.modalWorkflow = updated;
+          this.replaceWorkflow(updated);
+          this.isEditingWorkflowModal = false;
+          this.setWorkflowSuccess('Workflow updated');
+        },
+        error: (err: Error) => {
+          this.isSavingWorkflowEdit = false;
+          this.error = this.messageFromError(err, 'Failed to update workflow');
+        },
+      });
+  }
+
+  isWorkflowEditFieldInvalid(field: 'name' | 'description'): boolean {
+    const control = this.workflowEditForm.controls[field];
+    return control.invalid && (control.touched || control.dirty);
+  }
+
+  navigateToWorkflowVersions(workflowId: string): void {
+    this.router.navigate(['/dashboard/versions'], { queryParams: { workflowId } });
   }
 
   openStepModal(step: StepView): void {
@@ -385,11 +482,6 @@ export class WorkflowsComponent implements OnInit {
   goToStepsPage(page: number): void {
     if (page < 0 || page >= this.stepsTotalPages) return;
     this.stepsPage = page;
-  }
-
-  goToApisPage(page: number): void {
-    if (page < 0 || page >= this.apisTotalPages) return;
-    this.apisPage = page;
   }
 
   // ── Drag-and-drop step reorder ───────────────────────────────────────────────
@@ -441,17 +533,39 @@ export class WorkflowsComponent implements OnInit {
 
   // ── Delete with confirmation ──────────────────────────────────────────────────
 
-  requestDeleteWorkflow(event: Event, workflowId: string): void {
+  requestDeleteWorkflow(event: Event, workflow: WorkflowResponse): void {
     event.stopPropagation();
-    this.confirmingDeleteWorkflowId = workflowId;
+    if (this.modalWorkflow?.id === workflow.id) this.closeWorkflowModal();
+    this.deletePreviewWorkflowId = workflow.id;
+    this.deletePreviewWorkflow = workflow;
+    this.deleteWorkflowPreview = null;
+    this.isLoadingDeletePreview = true;
+    this.workflowService
+      .getDeletePreview(workflow.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (preview) => {
+          this.deleteWorkflowPreview = preview;
+          this.isLoadingDeletePreview = false;
+        },
+        error: () => {
+          this.isLoadingDeletePreview = false;
+          this.deletePreviewWorkflowId = null;
+          this.deletePreviewWorkflow = null;
+        },
+      });
   }
 
   cancelDeleteWorkflow(): void {
-    this.confirmingDeleteWorkflowId = null;
+    this.deletePreviewWorkflowId = null;
+    this.deletePreviewWorkflow = null;
+    this.deleteWorkflowPreview = null;
+    this.isLoadingDeletePreview = false;
   }
 
-  confirmDeleteWorkflow(workflowId: string): void {
-    if (this.isDeletingWorkflow) return;
+  confirmDeleteWorkflow(): void {
+    const workflowId = this.deletePreviewWorkflowId;
+    if (!workflowId || this.isDeletingWorkflow) return;
     this.isDeletingWorkflow = true;
     this.workflowService
       .delete(workflowId)
@@ -459,7 +573,7 @@ export class WorkflowsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.isDeletingWorkflow = false;
-          this.confirmingDeleteWorkflowId = null;
+          this.cancelDeleteWorkflow();
           if (this.expandedWorkflowId === workflowId) this.expandedWorkflowId = null;
           if (this.selectedWorkflowId === workflowId) this.selectedWorkflowId = '';
           this.loadWorkflows(this.workflowsPage);
@@ -505,6 +619,45 @@ export class WorkflowsComponent implements OnInit {
       });
   }
 
+  duplicateVersion(event: Event, workflowId: string, version: VersionView): void {
+    event.stopPropagation();
+    if (this.duplicatingVersionId) return;
+    this.duplicatingVersionId = version.versionId;
+    this.workflowService
+      .duplicateVersion(workflowId, version.versionId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.duplicatingVersionId = null;
+          this.loadVersionsForWorkflow(workflowId, this.versionsPaginationMap[workflowId]?.page ?? 0);
+          this.setWorkflowSuccess(`v${version.versionNumber} duplicated`);
+        },
+        error: (err: Error) => {
+          this.duplicatingVersionId = null;
+          this.error = this.messageFromError(err, 'Failed to duplicate version');
+        },
+      });
+  }
+
+  duplicateStep(versionId: string, step: StepView): void {
+    if (this.duplicatingStepId || this.isSavingStep) return;
+    this.duplicatingStepId = step.id;
+    this.stepService
+      .duplicate(versionId, step.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (newStep) => {
+          this.duplicatingStepId = null;
+          this.versionSteps = [...this.versionSteps, newStep];
+          this.setWorkflowSuccess('Step duplicated');
+        },
+        error: (err: Error) => {
+          this.duplicatingStepId = null;
+          this.error = this.messageFromError(err, 'Failed to duplicate step');
+        },
+      });
+  }
+
   requestDeleteStep(event: Event, stepId: string): void {
     event.stopPropagation();
     this.confirmingDeleteStepId = stepId;
@@ -521,6 +674,64 @@ export class WorkflowsComponent implements OnInit {
     } catch {
       return '';
     }
+  }
+
+  navigateToVersionExecutions(workflowId: string, versionId: string): void {
+    this.router.navigate(['/dashboard/executions'], {
+      queryParams: { workflowId, versionId },
+    });
+  }
+
+  navigateToStepApis(stepId: string): void {
+    this.router.navigate(['/dashboard/discovered-apis'], {
+      queryParams: {
+        workflowId: this.selectedWorkflowId || undefined,
+        versionId: this.stepsVersionId || undefined,
+        stepId,
+      },
+    });
+  }
+
+  openAliasEditor(event: Event, version: VersionView): void {
+    event.stopPropagation();
+    this.editingAliasVersionId = version.versionId;
+    this.aliasInputValue = version.alias ?? '';
+  }
+
+  cancelAliasEditor(): void {
+    this.editingAliasVersionId = null;
+    this.aliasInputValue = '';
+  }
+
+  saveAlias(workflowId: string, version: VersionView): void {
+    const alias = this.aliasInputValue.trim() || null;
+    this.isSavingAlias = true;
+    this.error = null;
+
+    this.workflowService
+      .updateVersionAlias(workflowId, version.versionId, { alias } satisfies VersionAliasUpdateRequest)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (updated) => {
+          this.versionsMap = {
+            ...this.versionsMap,
+            [workflowId]: (this.versionsMap[workflowId] ?? []).map((v) =>
+              v.versionId === version.versionId ? updated : v,
+            ),
+          };
+          if (this.modalVersion?.versionId === version.versionId) {
+            this.modalVersion = updated;
+          }
+          this.editingAliasVersionId = null;
+          this.aliasInputValue = '';
+          this.isSavingAlias = false;
+          this.setWorkflowSuccess('Alias saved');
+        },
+        error: (err: Error) => {
+          this.error = this.messageFromError(err, 'Failed to save alias');
+          this.isSavingAlias = false;
+        },
+      });
   }
 
   executeVersion(workflowId: string, version: VersionView): void {
@@ -554,6 +765,7 @@ export class WorkflowsComponent implements OnInit {
     if (this.stepsVersionId === versionId) return;
     this.isLoadingSteps = true;
     this.versionSteps = [];
+    this.versionExecutions = [];
     this.editingStepId = null;
     this.isAddingStep = false;
     this.stepsPage = 0;
@@ -571,6 +783,27 @@ export class WorkflowsComponent implements OnInit {
           this.isLoadingSteps = false;
         },
       });
+
+    if (this.selectedWorkflowId) {
+      this.executionService
+        .listByWorkflow(this.selectedWorkflowId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (executions) => {
+            this.versionExecutions = executions.filter((e) => e.versionId === versionId);
+          },
+          error: () => {
+            this.versionExecutions = [];
+          },
+        });
+    }
+  }
+
+  stepExecutionCount(stepId: string): number {
+    return this.versionExecutions.reduce(
+      (count, exec) => count + exec.stepResults.filter((sr) => sr.stepId === stepId).length,
+      0,
+    );
   }
 
   discoveredApisForStep(stepId: string): StepDiscoveredApiView[] {
@@ -582,6 +815,7 @@ export class WorkflowsComponent implements OnInit {
     this.assertionSelections = new Map();
     this.editingStepId = step.id;
     this.stepForm = this.stepFormFromView(step);
+    this.modalStep = null;
   }
 
   closeEditStep(): void {
@@ -792,6 +1026,9 @@ export class WorkflowsComponent implements OnInit {
       value: step.value ?? '',
       expectedValue: step.expectedValue ?? '',
       timeoutMs: step.timeoutMs,
+      optional: step.optional,
+      retryCount: step.retryCount,
+      metaJson: step.action !== 'ASSERT_API' ? (this.metaString(step.meta) || '{}') : '{}',
       apiUrl: String(meta['url'] ?? ''),
       apiMethod: String(meta['method'] ?? 'GET'),
       apiExpectedStatus: (meta['expectedStatus'] as number | undefined) ?? null,
@@ -806,6 +1043,9 @@ export class WorkflowsComponent implements OnInit {
       value: '',
       expectedValue: '',
       timeoutMs: null,
+      optional: false,
+      retryCount: 0,
+      metaJson: '{}',
       apiUrl: '',
       apiMethod: 'GET',
       apiExpectedStatus: null,
@@ -815,7 +1055,23 @@ export class WorkflowsComponent implements OnInit {
 
   private buildStepPayload(): StepRequest {
     const f = this.stepForm;
-    const base: StepRequest = { action: f.action, source: 'MANUAL' };
+    let extraMeta: Record<string, unknown> | undefined;
+    if (f.action !== 'ASSERT_API') {
+      try {
+        const parsed: unknown = JSON.parse(f.metaJson);
+        if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed) && Object.keys(parsed).length > 0) {
+          extraMeta = parsed as Record<string, unknown>;
+        }
+      } catch { /* invalid JSON — skip meta */ }
+    }
+    const base: StepRequest = {
+      action: f.action,
+      source: 'MANUAL',
+      optional: f.optional,
+      retryCount: f.retryCount,
+      ...(f.timeoutMs != null && { timeoutMs: f.timeoutMs }),
+      ...(extraMeta !== undefined && { meta: extraMeta }),
+    };
     switch (f.action) {
       case 'CLICK':
         return { ...base, selector: f.selector };
@@ -846,7 +1102,81 @@ export class WorkflowsComponent implements OnInit {
     }
   }
 
-  discoverApis(workflowId: string, version: VersionView): void {
+  openDiscoveryPicker(workflowId: string, version: VersionView): void {
+    if (this.discoveringVersionId || version.status !== 'READY') return;
+
+    this.discoveryPickerWorkflowId = workflowId;
+    this.discoveryPickerVersion = version;
+    this.discoveryPickerSteps = [];
+    this.discoveryPickerSelectedIds = new Set();
+    this.showDiscoveryPicker = true;
+
+    if (this.stepsVersionId === version.versionId && this.versionSteps.length > 0) {
+      this.discoveryPickerSteps = this.versionSteps;
+      this.discoveryPickerSelectedIds = new Set(this.versionSteps.map((s) => s.id));
+      return;
+    }
+
+    this.isLoadingDiscoveryPickerSteps = true;
+    this.stepService
+      .list(version.versionId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (steps) => {
+          this.discoveryPickerSteps = steps;
+          this.discoveryPickerSelectedIds = new Set(steps.map((s) => s.id));
+          this.isLoadingDiscoveryPickerSteps = false;
+        },
+        error: () => {
+          this.isLoadingDiscoveryPickerSteps = false;
+        },
+      });
+  }
+
+  closeDiscoveryPicker(): void {
+    this.showDiscoveryPicker = false;
+    this.discoveryPickerVersion = null;
+    this.discoveryPickerSteps = [];
+    this.discoveryPickerSelectedIds = new Set();
+    this.isLoadingDiscoveryPickerSteps = false;
+  }
+
+  toggleDiscoveryStep(stepId: string): void {
+    if (this.discoveryPickerSelectedIds.has(stepId)) {
+      this.discoveryPickerSelectedIds.delete(stepId);
+    } else {
+      this.discoveryPickerSelectedIds.add(stepId);
+    }
+  }
+
+  get allDiscoveryStepsSelected(): boolean {
+    return (
+      this.discoveryPickerSteps.length > 0 &&
+      this.discoveryPickerSteps.every((s) => this.discoveryPickerSelectedIds.has(s.id))
+    );
+  }
+
+  toggleAllDiscoverySteps(): void {
+    if (this.allDiscoveryStepsSelected) {
+      this.discoveryPickerSelectedIds = new Set();
+    } else {
+      this.discoveryPickerSelectedIds = new Set(this.discoveryPickerSteps.map((s) => s.id));
+    }
+  }
+
+  runDiscovery(): void {
+    const version = this.discoveryPickerVersion;
+    const workflowId = this.discoveryPickerWorkflowId;
+    if (!version || !workflowId || this.discoveryPickerSelectedIds.size === 0) return;
+
+    const allSelected = this.discoveryPickerSelectedIds.size === this.discoveryPickerSteps.length;
+    const stepIds = allSelected ? undefined : [...this.discoveryPickerSelectedIds];
+
+    this.closeDiscoveryPicker();
+    this.discoverApis(workflowId, version, stepIds);
+  }
+
+  discoverApis(workflowId: string, version: VersionView, stepIds?: string[]): void {
     if (this.discoveringVersionId || version.status !== 'READY') {
       return;
     }
@@ -854,11 +1184,10 @@ export class WorkflowsComponent implements OnInit {
     this.discoveringVersionId = version.versionId;
     this.discoveryResults = [];
     this.discoveryVersionId = null;
-    this.apisPage = 0;
     this.error = null;
 
     this.discoveryService
-      .discoverApis(workflowId, version.versionId)
+      .discoverApis(workflowId, version.versionId, stepIds)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (results) => {
@@ -871,16 +1200,6 @@ export class WorkflowsComponent implements OnInit {
           this.error = this.messageFromError(err, 'API discovery failed');
         },
       });
-  }
-
-  closeDiscoveryPanel(): void {
-    this.discoveryResults = [];
-    this.discoveryVersionId = null;
-    this.apisPage = 0;
-  }
-
-  totalDiscoveredApis(): number {
-    return this.discoveryResults.reduce((sum, r) => sum + r.apis.length, 0);
   }
 
   statusLabel(status: string): string {
@@ -926,6 +1245,15 @@ export class WorkflowsComponent implements OnInit {
   }
 
   openCreateWorkflow(): void {
+    this.showWorkflowForm = true;
+    this.workflowSuccess = null;
+  }
+
+  openDuplicateWorkflow(workflow: WorkflowResponse): void {
+    this.workflowForm.reset({
+      name: `${workflow.name} (copy)`,
+      description: workflow.description ?? '',
+    });
     this.showWorkflowForm = true;
     this.workflowSuccess = null;
   }
@@ -977,7 +1305,7 @@ export class WorkflowsComponent implements OnInit {
     return control.invalid && (control.touched || control.dirty);
   }
 
-  isRecordingFieldInvalid(fieldName: 'environmentId' | 'startPath'): boolean {
+  isRecordingFieldInvalid(fieldName: 'environmentId' | 'startPath' | 'alias'): boolean {
     const control = this.recordingForm.controls[fieldName];
     return control.invalid && (control.touched || control.dirty);
   }
@@ -1003,13 +1331,14 @@ export class WorkflowsComponent implements OnInit {
       .startRecording(selectedWorkflow.id, this.recordingPayload())
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (workflow) => {
-          if (workflow?.id) {
-            this.replaceWorkflow(workflow);
+        next: (response) => {
+          if (response.workflow?.id) {
+            this.replaceWorkflow(response.workflow);
           }
           this.loadWorkflows();
           this.phase = 'recording';
-          this.setWorkflowSuccess('Recording started');
+          this.setWorkflowSuccess('Recording started — close the browser when done');
+          this.listenForRecordingComplete(selectedWorkflow.id, response.versionId);
         },
         error: (err: Error) => {
           this.phase = 'idle';
@@ -1021,16 +1350,55 @@ export class WorkflowsComponent implements OnInit {
   recordingPayload(): WorkflowRecordingStartRequest {
     const value = this.recordingForm.getRawValue();
     const startPath = value.startPath.trim();
+    const alias = value.alias.trim();
 
-    return startPath
-      ? { environmentId: value.environmentId, startPath }
-      : { environmentId: value.environmentId };
+    return {
+      environmentId: value.environmentId,
+      ...(startPath && { startPath }),
+      ...(alias && { alias }),
+    };
   }
 
   replaceWorkflow(updatedWorkflow: WorkflowResponse): void {
     this.workflows = this.workflows.map((workflow) =>
       workflow.id === updatedWorkflow.id ? updatedWorkflow : workflow,
     );
+  }
+
+  private listenForRecordingComplete(workflowId: string, versionId: string): void {
+    this.closeRecordingEmitter();
+    this.recordingEmitter = new EventSource(this.workflowService.recordingStatusUrl(versionId));
+    let statusReceived = false;
+
+    this.recordingEmitter.addEventListener('status', (event: MessageEvent) => {
+      statusReceived = true;
+      const status = event.data as string;
+      this.closeRecordingEmitter();
+      this.phase = 'idle';
+      this.closeRecordingModal();
+      this.loadWorkflows();
+      if (status === 'READY') {
+        this.setWorkflowSuccess('Recording complete — version is ready');
+        this.selectedWorkflowId = workflowId;
+        this.expandedWorkflowId = workflowId;
+        this.pendingVersionSelect = { workflowId, versionId };
+        this.loadVersionsForWorkflow(workflowId, 0);
+      } else {
+        this.error = 'Recording finished with status: ' + status.toLowerCase();
+      }
+    });
+
+    this.recordingEmitter.onerror = () => {
+      if (statusReceived) return;
+      this.closeRecordingEmitter();
+      this.phase = 'idle';
+      this.error = 'Lost connection to recording session';
+    };
+  }
+
+  private closeRecordingEmitter(): void {
+    this.recordingEmitter?.close();
+    this.recordingEmitter = null;
   }
 
   dismissError(): void {
